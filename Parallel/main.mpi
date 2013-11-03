@@ -1,0 +1,67 @@
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <mpi.h>
+
+#define seed 1
+#define fMin -1.
+#define fMax 1.
+#define typeofmatrix double
+#define reductor(i,j,nu) (((i<nu) && (j<nu)) ? (nu*i+j) : -1)
+
+double fRand(){
+    double f = (double)rand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
+
+int main(int argc, char** argv)
+{
+	long long int *a,*b,*c,N=0,L=0,N1,N2,N3,MyIndx=0;
+	double sum=0.;
+	int rank,size;
+	MPI_Status status;
+	L= argc > 1 ? atoi(argv[1]):10;
+	N=10*L;
+	N1=N*L;
+	N2=L*L;
+	N3=N*L;
+	
+	MPI_Init(&argc,&argv);
+	MPI_Comm_size(MPI_COMM_WORLD,&size);
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+	//Нулевой процесс заполняет матрицу
+	MyIdx=N/size;
+	if(rank == 0){
+
+		
+		a=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N1);//Выделяем память
+		b=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N2);//Получаем указатель на матрицу b
+		c=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N3);//Получаем указатель на матрицу с
+		for(int i=0;i<N3;i++) a[i]=0.;//Зануляем
+		
+		srand(seed);//Инициализируем генератор случайных чисел
+		for(int i=0;i<N2;++i)	a[i]=fRand();//Заполняем матрицы псевдослучайными числами
+		MPI_Barrier(MPI_COMM_WORLD);
+		MPI_Scatter(a,MyIdx*MyIdx,MPI_DOUBLE,a,MyIdx*MyIdx,MPI_DOUBLE,0,MPI_COMM_WORLD);
+		MPI_Scatter(b,N2,MPI_DOUBLE,b,N2,MPI_DOUBLE,0,MPI_COMM_WORLD);
+		
+	}
+	else{
+		a=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N1);
+		b=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N2);//Получаем указатель на матрицу b
+		c=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N3);//Получаем указатель на матрицу с
+		//Перемножаем матрицы
+		for(int i=0;i<n;++i){
+			for(int k=0;k<n;k++){
+				abuf=a[reductor(i,k,n)];
+				for(int j=0;j<n;++j){
+					c[reductor(i,j,n)]+=abuf*b[reductor(k,j,n)];
+				}
+			}
+		}
+	}
+	
+	MPI_Finalize();
+	return 0;
+}
