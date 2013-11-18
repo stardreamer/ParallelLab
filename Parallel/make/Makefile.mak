@@ -27,12 +27,12 @@ mpimatrix:$(BINDIR_REL)/mpimatrix $(OBJFILES)
 	
 
 $(BINDIR_REL)/mpimatrix: $(OBJFILES) 
-	$(CC) -Wall $^ -o $@
+	$(CC) -Wall -lm $^ -o $@
 
 	
 
 $(OBJDIR_REL)/%.o: $(SRCDIR_REL)/%.c
-	$(CC) $<  -Wall -pedantic -c -std=c99 -MD $(addprefix -I, $(SRCDIR_REL)) -o $@ -pipe
+	$(CC) $<  -Wall -pedantic -lm -c -std=c99 -MD $(addprefix -I, $(SRCDIR_REL)) -o $@ -pipe
 	
 include  $(wildcard $(OBJDIR_REL)/*.d)
 #Все пользователи имеют право читать копируется в каталог
