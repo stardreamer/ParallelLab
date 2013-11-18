@@ -7,7 +7,6 @@
 #define seed 1
 #define fMin -1.
 #define fMax 1.
-#define typeofmatrix double
 #define reductor(i,j,nu) (((i<nu) && (j<nu)) ? (nu*i+j) : -1)
 
 double fRand(){
@@ -17,7 +16,7 @@ double fRand(){
 
 int main(int argc, char** argv)
 {
-	long long int *a,*b,*c,N=0,L=0,N1,N2,N3,MyIndx=0;
+	long long int *a,*b,*c,*numOfLines,N=0,L=0,N1,N2,N3,MyIdx=0;
 	double sum=0.;
 	int rank,size;
 	MPI_Status status;
@@ -31,26 +30,23 @@ int main(int argc, char** argv)
 	MPI_Comm_size(MPI_COMM_WORLD,&size);
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 	//Нулевой процесс заполняет матрицу
-	MyIdx=N/size;
 	if(rank == 0){
-
-		
-		a=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N1);//Выделяем память
-		b=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N2);//Получаем указатель на матрицу b
-		c=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N3);//Получаем указатель на матрицу с
-		for(int i=0;i<N3;i++) a[i]=0.;//Зануляем
+		a=(int*)malloc(sizeof(long long int)*N1);//Выделяем память
+		b=(long long int*)malloc(sizeof(long long int)*N2);//Получаем указатель на матрицу b
+		c=(long long int*)malloc(sizeof(long long int)*N3);//Получаем указатель на матрицу с
+		numOfLines=(long long int*)malloc(sizeof(long long int)*size)
 		
 		srand(seed);//Инициализируем генератор случайных чисел
-		for(int i=0;i<N2;++i)	a[i]=fRand();//Заполняем матрицы псевдослучайными числами
-		MPI_Barrier(MPI_COMM_WORLD);
-		MPI_Scatter(a,MyIdx*MyIdx,MPI_DOUBLE,a,MyIdx*MyIdx,MPI_DOUBLE,0,MPI_COMM_WORLD);
-		MPI_Scatter(b,N2,MPI_DOUBLE,b,N2,MPI_DOUBLE,0,MPI_COMM_WORLD);
+		for(int i=0;i<N1;++i)	a[i]=fRand();//Заполняем матрицы псевдослучайными числами
+		for(int i=0;i<N2;++i)	b[i]=fRand();//Заполняем матрицы псевдослучайными числами
+		for(int i=0;i<N3;++i)	numOfLines[i]=i;
+		MPI_Scatter(numOfLines,1,MPI_DOUBLE,&MyIdx,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 		
 	}
 	else{
-		a=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N1);
-		b=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N2);//Получаем указатель на матрицу b
-		c=(typeofmatrix*)malloc(sizeof(typeofmatrix)*N3);//Получаем указатель на матрицу с
+		/*a=(long long int*)malloc(sizeof(long long int)*N1);
+		b=(long long int*)malloc(sizeof(long long int)*N2);//Получаем указатель на матрицу b
+		c=(long long int*)malloc(sizeof(long long int)*N3);//Получаем указатель на матрицу с
 		//Перемножаем матрицы
 		for(int i=0;i<n;++i){
 			for(int k=0;k<n;k++){
@@ -59,7 +55,8 @@ int main(int argc, char** argv)
 					c[reductor(i,j,n)]+=abuf*b[reductor(k,j,n)];
 				}
 			}
-		}
+		}*/
+		fprintf(stderr,"MyNumber=%i\n",Myidx)
 	}
 	
 	MPI_Finalize();
