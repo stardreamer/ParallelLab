@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "support.h"
 
 #define seed 1 //семя для генерации чисел
@@ -56,14 +55,9 @@ int main(int argc, char** argv){
 	}
 	
 	(*times)=Core_Candidat(a,b,c,borders,L,rank,size,&sum,&resultnorm,message_type); // тут происходит весь подсчет
+	printResult(rank,borders,times,sum,resultnorm,"Simple break");
 	
-	fprintf(stderr,"Rank %i [%i;%i] len %i result %lf time %lf(s)\n",rank,(*borders).left,(*borders).right,(*borders).length,sum,*times);
-	MPI_Barrier(MPI_COMM_WORLD);
-	if(rank==0){
-		resultnorm=sqrt(resultnorm);
-		fprintf(stderr,"Total result %lf time %lf(s)\n",resultnorm,(*times));
-	}
-	
+
 	//Часть с неравномерным разбиением
 	if(rank!=0){
 		a=(double*)realloc(a,sizeof(double)*10*L);//Перевыделяем память для a
@@ -88,15 +82,9 @@ int main(int argc, char** argv){
 	
 	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
 	
-	fprintf(stderr,"rank %i border %i %i %i\n",rank,(*borders).left,(*borders).right,(*borders).length);
 	(*times)=Core_Candidat(a,b,c,borders,L,rank,size,&sum,&resultnorm,message_type); // тут происходит весь подсчет
-	
-	fprintf(stderr,"Rank %i [%i;%i] len %i result %lf time %lf(s)\n",rank,(*borders).left,(*borders).right,(*borders).length,sum,*times);
-	MPI_Barrier(MPI_COMM_WORLD);
-	if(rank==0){
-		resultnorm=sqrt(resultnorm);
-		fprintf(stderr,"Total result %lf time %lf(s)\n",resultnorm,(*times));
-	}
+
+	printResult(rank,borders,times,sum,resultnorm,"Addaptive break");
 	
 	MPI_Finalize();
 	
