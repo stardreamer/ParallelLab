@@ -32,7 +32,7 @@ $(BINDIR_REL)/mpimatrix: $(OBJFILES)
 	
 
 $(OBJDIR_REL)/%.o: $(SRCDIR_REL)/%.c
-	$(CC) $<  -Wall -pedantic -lm -c -std=c99 -MD $(addprefix -I, $(SRCDIR_REL)) -o $@ -pipe
+	$(CC) $<  -Wall -pedantic -lm -O2 -c -std=c99 -MD $(addprefix -I, $(SRCDIR_REL)) -o $@ -pipe
 	
 include  $(wildcard $(OBJDIR_REL)/*.d)
 #Все пользователи имеют право читать копируется в каталог
