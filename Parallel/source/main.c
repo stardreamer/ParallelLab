@@ -16,10 +16,11 @@ double fRand(){
 
 int main(int argc, char** argv){
 	double *a,*b,*c; //тут храним матрицы
+	double *times;
 	border *borders; //границы разбиений
 	int  N=0,L=0,N1,N2,N3;
 	double sum=0.,resultnorm=0.;
-	int rank,size,*displs,*scounts;
+	int rank,size;
 	MPI_Status status;
 	MPI_Datatype message_type;
 	
@@ -38,6 +39,7 @@ int main(int argc, char** argv){
 	b=(double*)malloc(sizeof(double)*N2);//Получаем указатель на матрицу b
 	for(int i=0;i<N2;++i)	b[i]=fRand();//Заполняем матрицы псевдослучайными числами
 	borders=(border*)malloc(sizeof(border));//Выделяем память под границы
+	times=(double*)malloc(sizeof(double));
 	Build_derived_type(borders,&message_type);//Инициализируем свой mpi тип
 	
 	
@@ -45,11 +47,9 @@ int main(int argc, char** argv){
 	if(rank == 0){
 		a=(double*)malloc(sizeof(double)*N1);//Выделяем память
 		c=(double*)malloc(sizeof(double)*N3);//Получаем указатель на матрицу с
-		displs=(int*)malloc(sizeof(int)*size);
-		scounts=(int*)malloc(sizeof(int)*size);
 		borders=(border*)realloc(borders,sizeof(border)*size);
 		for(int i=0;i<N1;++i)	a[i]=fRand();//Заполняем матрицы псевдослучайными числами
-		getBorder(borders,N,size,SIMPLE_BREAK);
+		getBorder(borders,N,size,SIMPLE_BREAK,NULL);
 	}
 	
 	double wt=-MPI_Wtime();
@@ -86,9 +86,31 @@ int main(int argc, char** argv){
 		fprintf(stderr,"Total result %lf time %lf(s)\n",resultnorm,wt);
 	}
 	
+	//Часть с неравномерным разбиением
+	if(rank!=0){
+		a=(double*)realloc(a,sizeof(double)*10*L);//Перевыделяем память для a
+		for(int i=0;i<10*L;++i) a[i]=fRand();
+		c=(double*)realloc(c,sizeof(double)*10*L);//Перевыделяем память для с
+	}
+	else{
+		times=(double*)realloc(times,sizeof(double)*size);
+	}
+	//Определяем производительность
+	(*times)=-MPI_Wtime();
+	Mprod(a,b,c,10,L,L);
+	(*times) += MPI_Wtime();
+	//Собираем времена на 0 процессе
+	MPI_Gather(times,1,MPI_DOUBLE,times,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
 	
+	//Пересчитаем границы
+	if(rank==0){
+			getBorder(borders,N,size,ADDAPRIVE_BREAK,times);
+	}
+	
+	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
+	
+		fprintf(stderr,"rank %i border %i %i %i\n",rank,(*borders).left,(*borders).right,(*borders).length);
 	MPI_Finalize();
-
 	
 	return 0;
 }

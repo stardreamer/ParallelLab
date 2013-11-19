@@ -11,6 +11,7 @@ struct Border{
 };
 typedef struct Border border;
 void Build_derived_type(border* indata, MPI_Datatype* message_type_ptr);
-void getBorder(border* borders,int L,int size,int mode);
+void getBorder(border* borders,int N,int size,int mode,double *);
 void Mprod(double *a,double *b,double *c,int l1,int l2,int l3);
+double Core_Candidat();
 #endif
