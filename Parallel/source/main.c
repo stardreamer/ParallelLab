@@ -1,11 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include "support.h"
 
-#define seed 1
-#define fMin -1.
-#define fMax 1.
+#define seed 1 //семя для генерации чисел
+#define fMin -1.//нижняя граница чисел
+#define fMax 1.//верхняя граница чисел
 
 
 
@@ -16,16 +14,19 @@ double fRand(){
 
 int main(int argc, char** argv){
 	double *a,*b,*c; //тут храним матрицы
-	double *times;
+	a=b=c=NULL;//устанавливаем указатели в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
+	double *times;//указатель на время работы(массив на root на остальных память только под один элемент)
+	times=NULL;//устанавливаем указатель в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
 	border *borders; //границы разбиений
-	int  N=0,L=0,N1,N2,N3;
-	double sum=0.,resultnorm=0.;
-	int rank,size;
-	MPI_Status status;
-	MPI_Datatype message_type;
+	borders=NULL;//устанавливаем указатель в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
+	int  N=0/*Число строк*/,L=0/*Число столбцов*/,N1/*Размерность a*/,N2/*Размерность b*/,N3/*Размерность c*/;
+	double sum=0./*Сумма квадратов*/,resultnorm=0./*Норма*/;
+	int rank/*id процесса*/,size/*Число процессов*/;
+	MPI_Datatype message_type/*Тут будет храниться представление структуры border*/;
 	
 	
-	L=argc>1?atoi(argv[1]):10;
+	L=argc>1?atoi(argv[1]):10;//Получаем L
+	//Устанавливаем размерности согласно заданию
 	N=10*L;
 	N1=N*L;
 	N2=L*L;
@@ -34,12 +35,14 @@ int main(int argc, char** argv){
 	MPI_Init(&argc,&argv); //Необходимо для вызова MPI функций
 	MPI_Comm_size(MPI_COMM_WORLD,&size);
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-	srand(seed);//Инициализируем генератор случайных чисел
+	
+	//TODO: Во всех процессах счетчик инициализируется одним числом.(b заполняется во всех независимо) Исправить b похожий на a
+	srand(seed);//Инициализируем генератор случайных чисел 
 	
 	b=(double*)malloc(sizeof(double)*N2);//Получаем указатель на матрицу b
 	for(int i=0;i<N2;++i)	b[i]=fRand();//Заполняем матрицы псевдослучайными числами
 	borders=(border*)malloc(sizeof(border));//Выделяем память под границы
-	times=(double*)malloc(sizeof(double));
+	times=(double*)malloc(sizeof(double));//Выделяем память под один элемент
 	Build_derived_type(borders,&message_type);//Инициализируем свой mpi тип
 	
 	
@@ -52,38 +55,13 @@ int main(int argc, char** argv){
 		getBorder(borders,N,size,SIMPLE_BREAK,NULL);
 	}
 	
-	double wt=-MPI_Wtime();
-	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
+	(*times)=Core_Candidat(a,b,c,borders,L,rank,size,&sum,&resultnorm,message_type); // тут происходит весь подсчет
 	
-	if(rank!=0){
-		a=(double*)malloc(sizeof(double)*(*borders).length*L);//Выделяем память
-		c=(double*)malloc(sizeof(double)*(*borders).length*L);//Получаем указатель на матрицу с
-		for(int i=0;i<(*borders).length*L;i++) c[i]=0.;
-	}
-	else{
-		for(int g=0;g<size;++g){//рассчитываем число элементов и смещение
-			displs[g]=borders[g].left*L;
-			scounts[g]=borders[g].length*L;
-		}
-	}
-	
-	for(int i=0;i<(*borders).length*L;++i) c[i]=0.;
-		
-	MPI_Scatterv(a,scounts,displs,MPI_DOUBLE,a,(*borders).length*L,MPI_DOUBLE,0,MPI_COMM_WORLD);
-	
-	//Перемножаем матрицы
-	Mprod(a,b,c,(*borders).length,L,L);
-	
-	//Считаем сумму квадратов
-	for(int i=0;i<(*borders).length*L;++i)	sum+=c[i]*c[i];
-	//Собираем сумму на root
-	MPI_Reduce(&sum,&resultnorm,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-	wt += MPI_Wtime();//замер времени
-	fprintf(stderr,"Rank %i [%i;%i] len %i result %lf time %lf(s)\n",rank,(*borders).left,(*borders).right,(*borders).length,sum,wt);
+	fprintf(stderr,"Rank %i [%i;%i] len %i result %lf time %lf(s)\n",rank,(*borders).left,(*borders).right,(*borders).length,sum,*times);
 	MPI_Barrier(MPI_COMM_WORLD);
 	if(rank==0){
 		resultnorm=sqrt(resultnorm);
-		fprintf(stderr,"Total result %lf time %lf(s)\n",resultnorm,wt);
+		fprintf(stderr,"Total result %lf time %lf(s)\n",resultnorm,(*times));
 	}
 	
 	//Часть с неравномерным разбиением
@@ -93,8 +71,9 @@ int main(int argc, char** argv){
 		c=(double*)realloc(c,sizeof(double)*10*L);//Перевыделяем память для с
 	}
 	else{
-		times=(double*)realloc(times,sizeof(double)*size);
+		times=(double*)realloc(times,sizeof(double)*size);//на root перевыделяем память под времена
 	}
+	
 	//Определяем производительность
 	(*times)=-MPI_Wtime();
 	Mprod(a,b,c,10,L,L);
@@ -109,7 +88,16 @@ int main(int argc, char** argv){
 	
 	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
 	
-		fprintf(stderr,"rank %i border %i %i %i\n",rank,(*borders).left,(*borders).right,(*borders).length);
+	fprintf(stderr,"rank %i border %i %i %i\n",rank,(*borders).left,(*borders).right,(*borders).length);
+	(*times)=Core_Candidat(a,b,c,borders,L,rank,size,&sum,&resultnorm,message_type); // тут происходит весь подсчет
+	
+	fprintf(stderr,"Rank %i [%i;%i] len %i result %lf time %lf(s)\n",rank,(*borders).left,(*borders).right,(*borders).length,sum,*times);
+	MPI_Barrier(MPI_COMM_WORLD);
+	if(rank==0){
+		resultnorm=sqrt(resultnorm);
+		fprintf(stderr,"Total result %lf time %lf(s)\n",resultnorm,(*times));
+	}
+	
 	MPI_Finalize();
 	
 	return 0;
