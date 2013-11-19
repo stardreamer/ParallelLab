@@ -14,12 +14,12 @@ double fRand(){
 int main(int argc, char** argv){
 	double *a,*b,*c; //тут храним матрицы
 	a=b=c=NULL;//устанавливаем указатели в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
-	double *times;//указатель на время работы(массив на root на остальных память только под один элемент)
+	double *times,timediff=0.;//указатель на время работы(массив на root на остальных память только под один элемент)
 	times=NULL;//устанавливаем указатель в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
 	border *borders; //границы разбиений
 	borders=NULL;//устанавливаем указатель в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
 	int  N=0/*Число строк*/,L=0/*Число столбцов*/,N1/*Размерность a*/,N2/*Размерность b*/,N3/*Размерность c*/;
-	double sum=0./*Сумма квадратов*/,resultnorm=0./*Норма*/;
+	double sum=0./*Сумма квадратов*/,resultnorm=0./*Норма*/,normdiff=0.;
 	int rank/*id процесса*/,size/*Число процессов*/;
 	MPI_Datatype message_type/*Тут будет храниться представление структуры border*/;
 	
@@ -55,6 +55,9 @@ int main(int argc, char** argv){
 	}
 	
 	(*times)=Core_Candidat(a,b,c,borders,L,rank,size,&sum,&resultnorm,message_type); // тут происходит весь подсчет
+	timediff=(*times);
+	normdiff=resultnorm;
+	
 	printResult(rank,borders,times,sum,resultnorm,"Simple break");
 	
 
@@ -83,9 +86,14 @@ int main(int argc, char** argv){
 	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
 	
 	(*times)=Core_Candidat(a,b,c,borders,L,rank,size,&sum,&resultnorm,message_type); // тут происходит весь подсчет
-
+	timediff-=(*times);
+	normdiff-=resultnorm;
+	
 	printResult(rank,borders,times,sum,resultnorm,"Addaptive break");
 	
+	
+	MPI_Barrier(MPI_COMM_WORLD);
+	if(rank==0)	fprintf(stderr,"++++++++++++++++++++++++++++++\nTimediff: %lf\nNormdiff: %.10lf\n",timediff,normdiff);
 	MPI_Finalize();
 	
 	return 0;
