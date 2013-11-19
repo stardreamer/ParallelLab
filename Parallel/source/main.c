@@ -6,7 +6,6 @@
 #define seed 1
 #define fMin -1.
 #define fMax 1.
-#define reductor(i,j,nu) (nu*i+j) 
 
 
 
@@ -19,7 +18,7 @@ int main(int argc, char** argv){
 	double *a,*b,*c; //тут храним матрицы
 	border *borders; //границы разбиений
 	int  N=0,L=0,N1,N2,N3;
-	double sum=0.,abuf=0.,resultnorm=0.;
+	double sum=0.,resultnorm=0.;
 	int rank,size,*displs,*scounts;
 	MPI_Status status;
 	MPI_Datatype message_type;
@@ -71,15 +70,9 @@ int main(int argc, char** argv){
 	for(int i=0;i<(*borders).length*L;++i) c[i]=0.;
 		
 	MPI_Scatterv(a,scounts,displs,MPI_DOUBLE,a,(*borders).length*L,MPI_DOUBLE,0,MPI_COMM_WORLD);
-	//Перемножаем матрицы
-	for(int i=0;i<(*borders).length;++i){
-		for(int k=0;k<L;++k){
-			abuf=a[reductor(i,k,L)]; //буфферизуем для ускорения доступа
-			for(int j=0;j<L;++j)
-				c[reductor(i,j,L)]+=abuf*b[reductor(k,j,L)];		
-		}
-	}
 	
+	//Перемножаем матрицы
+	Mprod(a,b,c,(*borders).length,L,L);
 	
 	//Считаем сумму квадратов
 	for(int i=0;i<(*borders).length*L;++i)	sum+=c[i]*c[i];
@@ -92,6 +85,7 @@ int main(int argc, char** argv){
 		resultnorm=sqrt(resultnorm);
 		fprintf(stderr,"Total result %lf time %lf(s)\n",resultnorm,wt);
 	}
+	
 	
 	MPI_Finalize();
 

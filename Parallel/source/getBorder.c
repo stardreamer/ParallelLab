@@ -11,21 +11,21 @@ void getBorder(border* borders,int N,int size,int mode){
 				for(int g=0;g<size;g++){
 					borders[g].left=(g)*h;
 					borders[g].right=(g+1)*h-1;
-					borders[g].length=h;
+					borders[g].length=borders[g].right-borders[g].left+1;
 				}
 			}
 			else{
 
 				for(int g=0;g<m;++g){
-					borders[g].left=g*h;
-					borders[g].right=(g+1)*h;
-					borders[g].length=(h+1);
+					borders[g].left=g*(h+1);
+					borders[g].right=(g+1)*h+g;
+					borders[g].length=borders[g].right-borders[g].left+1;
 				}
 
 				for(int g=m;g<size;++g){
-					borders[g].left=g*h+1;
-					borders[g].right=(g+1)*h;
-					borders[g].length=h;
+					borders[g].left=(g)*h+m;
+					borders[g].right=(g)*h+h+m-1;
+					borders[g].length=borders[g].right-borders[g].left+1;
 				}		
 			}
 		break;
