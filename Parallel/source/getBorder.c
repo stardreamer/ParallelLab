@@ -2,9 +2,11 @@
 
 void getBorder(border* borders,int N,int size,int mode,double *times){
 	int h,m;
-	double R=0.;
+	double R=0.;//Коэффициент для неравномерного деления
+	 
 	h=N/(size);
 	m=(N%(size));
+	
 	switch(mode){
 		case SIMPLE_BREAK:
 			if(m==0){
@@ -30,15 +32,16 @@ void getBorder(border* borders,int N,int size,int mode,double *times){
 			}
 		break;
 		case ADDAPRIVE_BREAK:
-			for(int i=0;i<size;++i)
-				R+=1./times[i];
+			for(int i=0;i<size;++i)	R+=1./times[i];//Считаем коэффициент
 			double prevrightborder=0.;//предыдущая правая граница
+			
 			for(int i=0;i<m;++i){
 				borders[i].length=N*(1./(times[i]*R))+1;
 				borders[i].left=prevrightborder;
 				borders[i].right=prevrightborder+(borders[i].length-1);
 				prevrightborder=borders[i].right+1;
 			}
+			
 			for(int i=m;i<size;++i){
 				borders[i].length=N*(1./(times[i]*R));
 				borders[i].left=prevrightborder;
@@ -47,6 +50,7 @@ void getBorder(border* borders,int N,int size,int mode,double *times){
 			}
 		break;
 		default:
+			return;
 		break;
 	}
 }

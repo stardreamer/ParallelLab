@@ -18,10 +18,9 @@ void Build_derived_type(border* indata, MPI_Datatype* message_type_ptr){
  
 
   /* Определить количество элементов каждого типа */
-
   block_lengths[0]=block_lengths[1]=block_lengths[2] = 1;
+  
   /* Вычислить смещения элементов * относительно indata */
-
   MPI_Address(indata, &addresses[0]);
   MPI_Address(&(indata->left), &addresses[1]);
   MPI_Address(&(indata->right), &addresses[2]);
