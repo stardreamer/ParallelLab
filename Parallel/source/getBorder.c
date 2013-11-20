@@ -50,7 +50,6 @@ void getBorder(border* borders,int N,int size,int mode,double *times){
 			}
 			
 			missing=N-missing;//Подсчитываем число потерянных строк
-			
 			//Самая "быстрая" пузырьковая сортировка xD (сортируем индексы процессов в порядке производительности)
 			for(int i=0;i<size;++i)
 				for(int j=size-1;j>i;--j){
