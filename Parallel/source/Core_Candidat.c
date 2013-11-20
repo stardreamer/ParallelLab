@@ -4,7 +4,7 @@ double Core_Candidat(double *a,double *b,double *c,border *borders,int L,int ran
 	int *displs/*указатель на смещения*/,*scounts/*указатель на число элеемнтов*/;
 	*sum=0.;/*Зануляем перед подсчетом*/
 	double wt=-MPI_Wtime();/*Засекаем время*/
-	
+	displs=scounts=NULL;
 	//Рассылаем границы разбиений(они идут друг за другом номера элементов соответствуют номерам процессов)
 	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
 	
