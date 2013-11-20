@@ -63,9 +63,9 @@ int main(int argc, char** argv){
 
 	//Часть с неравномерным разбиением
 	if(rank!=0){
-		a=(double*)realloc(a,sizeof(double)*10*L);//Перевыделяем память для a
-		for(int i=0;i<10*L;++i) a[i]=fRand();
-		c=(double*)realloc(c,sizeof(double)*10*L);//Перевыделяем память для с
+		a=(double*)realloc(a,sizeof(double)*100*L);//Перевыделяем память для a
+		for(int i=0;i<100*L;++i) a[i]=fRand();
+		c=(double*)realloc(c,sizeof(double)*100*L);//Перевыделяем память для с
 	}
 	else{
 		times=(double*)realloc(times,sizeof(double)*size);//на root перевыделяем память под времена
@@ -73,7 +73,7 @@ int main(int argc, char** argv){
 	
 	//Определяем производительность
 	(*times)=-MPI_Wtime();
-	Mprod(a,b,c,10,L,L);
+	Mprod(a,b,c,100,L,L);
 	(*times) += MPI_Wtime();
 	//Собираем времена на 0 процессе
 	MPI_Gather(times,1,MPI_DOUBLE,times,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
