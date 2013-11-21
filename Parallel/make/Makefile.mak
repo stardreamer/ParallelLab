@@ -6,7 +6,7 @@ OBJDIR := obj
 BINDIR := bin
 
 CC := mpicc
-FLAGS := -Wall -pedantic -lm -O2 -c -std=c99 -march=native -MD
+FLAGS := -Wall -pedantic -Wstrict-overflow=4 -Wformat-security -Wextra -Wfloat-equal -Wundef -Wshadow -O3 -c -std=c99 -march=native -MD
 BINDIR_REL := $(addprefix ../, $(BINDIR))
 
 SRCDIR_REL := $(addprefix ../, $(SRCDIR))
@@ -27,12 +27,12 @@ mpimatrix:$(BINDIR_REL)/mpimatrix $(OBJFILES)
 	
 
 $(BINDIR_REL)/mpimatrix: $(OBJFILES) 
-	$(CC) -Wall -lm $^ -o $@
+	$(CC) -Wall $^ -o $@ -lm
 
 	
 
 $(OBJDIR_REL)/%.o: $(SRCDIR_REL)/%.c
-	$(CC) $<  $(FLAGS) $(addprefix -I, $(SRCDIR_REL)) -o $@ -pipe
+	$(CC) $<  $(FLAGS) $(addprefix -I, $(SRCDIR_REL)) -o $@ -pipe -lm
 	
 include  $(wildcard $(OBJDIR_REL)/*.d)
 #Все пользователи имеют право читать копируется в каталог
