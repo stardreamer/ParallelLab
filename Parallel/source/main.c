@@ -13,7 +13,7 @@ double fRand(){
 
 int main(int argc, char** argv){
 	double *a,*b,*c; //тут храним матрицы
-	a=b=c=NULL;//устанавливаем указатели в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
+	a=c=NULL;//устанавливаем указатели в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
 	double *times,timediff=0.;//указатель на время работы(массив на root на остальных память только под один элемент)
 	times=NULL;//устанавливаем указатель в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
 	border *borders; //границы разбиений
@@ -50,6 +50,7 @@ int main(int argc, char** argv){
 		a=(double*)malloc(sizeof(double)*N1);//Выделяем память
 		c=(double*)malloc(sizeof(double)*N3);//Получаем указатель на матрицу с
 		borders=(border*)realloc(borders,sizeof(border)*size);
+		if(borders==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
 		for(int i=0;i<N1;++i)	a[i]=fRand();//Заполняем матрицы псевдослучайными числами
 		getBorder(borders,N,size,SIMPLE_BREAK,NULL);
 	}
@@ -65,18 +66,20 @@ int main(int argc, char** argv){
 	if(rank!=0){
 		if(N>100){
 			a=(double*)realloc(a,sizeof(double)*100*L);//Перевыделяем память для a
-			for(int i=0;i<100*L;++i) a[i]=fRand();
 			c=(double*)realloc(c,sizeof(double)*100*L);//Перевыделяем память для с
+			if(a==NULL || c==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
+			for(int i=0;i<100*L;++i) a[i]=fRand();
 		}
 		else{
 			a=(double*)realloc(a,sizeof(double)*N*L);//Перевыделяем память для a
-			for(int i=0;i<N*L;++i) a[i]=fRand();
 			c=(double*)realloc(c,sizeof(double)*N*L);//Перевыделяем память для с
-		
+			if(a==NULL || c==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
+			for(int i=0;i<N*L;++i) a[i]=fRand();
 		}
 	}
 	else{
 		times=(double*)realloc(times,sizeof(double)*size);//на root перевыделяем память под времена
+		if(times==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
 	}
 	
 	//Определяем производительность

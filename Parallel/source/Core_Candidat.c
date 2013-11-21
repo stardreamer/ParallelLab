@@ -13,6 +13,7 @@ double Core_Candidat(double *a,double *b,double *c,border *borders,int L,int ran
 		else        a=(double*)realloc(a,sizeof(double)*(*borders).length*L);//Если выделена, то перевыделяем
 		if(c==NULL) c=(double*)malloc(sizeof(double)*(*borders).length*L);//Получаем указатель на матрицу с
 		else        c=(double*)realloc(c,sizeof(double)*(*borders).length*L);//Если выделена, то перевыделяем
+		if(a==NULL || c==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
 		for(int i=0;i<(*borders).length*L;i++) c[i]=0.;//зануляем с
 	}
 	else{

@@ -6,7 +6,7 @@ OBJDIR := obj
 BINDIR := bin
 
 CC := mpicc
-FLAGS := -Wall -pedantic -Wstrict-overflow=4 -Wformat-security -Wextra -Wfloat-equal -Wundef -Wshadow -O3 -c -std=c99 -march=native -MD
+FLAGS := -Wall -pedantic -ffreestanding -Wstrict-overflow=4 -Wformat-security -Wextra -Wfloat-equal -Wundef -Wshadow -O3 -c -std=c99 -MD
 BINDIR_REL := $(addprefix ../, $(BINDIR))
 
 SRCDIR_REL := $(addprefix ../, $(SRCDIR))
@@ -40,6 +40,7 @@ clean:
 	@rm -f $(OBJDIR_REL)/*.o $(OBJDIR_REL)/*.d
 	@rm -f $(OBJDIR_REL_S)/*.o $(OBJDIR_REL_S)/*.d
 	@rm -f $(OBJDIR_REL_D)/*.o $(OBJDIR_REL_D)/*.d
+	@rm -f $(BINDIR_REL)/*
 	@echo "Очистка завершена!"
 delete:
 	@echo "Клиент удалён!"

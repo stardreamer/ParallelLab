@@ -1,5 +1,5 @@
-../obj/main.o: ../source/main.c /usr/include/stdc-predef.h \
- ../source/support.h /usr/include/math.h /usr/include/features.h \
+../obj/main.o: ../source/main.c ../source/support.h /usr/include/math.h \
+ /usr/include/features.h /usr/include/stdc-predef.h \
  /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
  /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
  /usr/include/bits/huge_val.h /usr/include/bits/huge_valf.h \
