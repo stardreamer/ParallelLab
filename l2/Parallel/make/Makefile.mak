@@ -6,7 +6,7 @@ OBJDIR := obj
 BINDIR := bin
 
 CC := mpicc
-FLAGS := -Wall -pedantic -ffreestanding -Wstrict-overflow=4 -Wformat-security -Wextra -Wfloat-equal -Wundef -Wshadow -O3 -c -std=c99 -MD
+FLAGS := -Wall -pedantic -ffreestanding -Wstrict-overflow=4 -Wformat-security -Wextra -Wfloat-equal -Wundef -Wshadow -O3  -c -std=c99 -MD
 BINDIR_REL := $(addprefix ../, $(BINDIR))
 
 SRCDIR_REL := $(addprefix ../, $(SRCDIR))

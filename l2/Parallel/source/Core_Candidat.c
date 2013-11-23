@@ -40,5 +40,7 @@ double Core_Candidat(double *a,double *b,double *c,border *borders,int L,int ran
 	MPI_Reduce(sum,resultnorm,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 	
 	wt += MPI_Wtime();//замер времени
+	free(displs);
+	free(scounts);
 	return wt;//возвращаем время
 }
