@@ -1,2 +1,6 @@
-l2/Parallel/bin/*
-l2/Parallel/obj/*
+*.o
+*.ko
+*.d
+*.obj
+
+l2/Parallel/bin/*.*
