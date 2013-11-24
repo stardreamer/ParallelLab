@@ -5,7 +5,7 @@
 #include <math.h>
 #define M_PI 3.14159265358979323846
 struct Point{
-	double X,Y,U;
+	double X,Y,U,dt;
 	int Tstep;
 };
 typedef struct Point point;
@@ -14,6 +14,11 @@ inline double lambda(double u) __attribute__((always_inline));
 inline double rho(double u) __attribute__((always_inline));
 inline double c(double u) __attribute__((always_inline));
 inline double u0(double x,double y) __attribute__((always_inline));
+inline int reductor(int i,int j) __attribute__((always_inline));
+
+inline int reductor(int i,int j,int l){
+	return (l*i+j);
+}
 
 inline double lambda(double u){
 	return 1.45+2.3*1e-2*u-2*1e-6*u*u;
@@ -31,15 +36,15 @@ inline double u0(double x,double y){
 	return (300.+400.*x)*(sin(M_PI*y)+1.);
 }
 
-void M_U(point *curPoint,point *lastPoint,size_t n){
-	for(size_t i=0;i<n;++i){
-		if(curPoint[i].Tstep==0)
-				curPoint[i].U=u0(curPoint[i].X,curPoint[i].Y);
-		else
-				curPoint[i].U=1.;
-	}
-	for(size_t i=0;i<n;++i)
-			lastPoint[i].U=curPoint[i].U;
+
+void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L){
+	for(int i=0;i<lx;++i)
+		for(int j=0;j<ly;++j)
+			curPoint[reductor(i,j,L)].U=
+				lastPoint(reductor(i,j,L))+
+				(curPoint[reductor(i,j,L)].dt/c(lastPoint(reductor(i,j,L)))*rho(lastPoint(reductor(i,j,L))))*
+				()
+		
 }
 
 
