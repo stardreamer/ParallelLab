@@ -5,7 +5,7 @@
 #include <math.h>
 #define M_PI 3.14159265358979323846
 struct Point{
-	double X,Y,U,dt;
+	double X,Y,U,dx,dy,dt;
 	int Tstep;
 };
 typedef struct Point point;
@@ -14,7 +14,7 @@ inline double lambda(double u) __attribute__((always_inline));
 inline double rho(double u) __attribute__((always_inline));
 inline double c(double u) __attribute__((always_inline));
 inline double u0(double x,double y) __attribute__((always_inline));
-inline int reductor(int i,int j) __attribute__((always_inline));
+inline int reductor(int i,int j,int l) __attribute__((always_inline));
 
 inline int reductor(int i,int j,int l){
 	return (l*i+j);
@@ -41,9 +41,14 @@ void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L){
 	for(int i=0;i<lx;++i)
 		for(int j=0;j<ly;++j)
 			curPoint[reductor(i,j,L)].U=
-				lastPoint(reductor(i,j,L))+
-				(curPoint[reductor(i,j,L)].dt/c(lastPoint(reductor(i,j,L)))*rho(lastPoint(reductor(i,j,L))))*
-				()
+				lastPoint[reductor(i,j,L)].U+
+				(curPoint[reductor(i,j,L)].dt/(c(lastPoint[reductor(i,j,L)].U)*rho(lastPoint[reductor(i,j,L)].U)))*
+				(
+				lambda((lastPoint[reductor(i+1,j,L)].U+lastPoint[reductor(i,j,L)].U)/2.)*(lastPoint[reductor(i+1,j,L)].U-lastPoint[reductor(i,j,L)].U)/lastPoint[reductor(i,j,L)].dx*lastPoint[reductor(i,j,L)].dx-
+				lambda((lastPoint[reductor(i-1,j,L)].U+lastPoint[reductor(i,j,L)].U)/2.)*(lastPoint[reductor(i,j,L)].U-lastPoint[reductor(i-1,j,L)].U)/lastPoint[reductor(i,j,L)].dx*lastPoint[reductor(i,j,L)].dx+
+				lambda((lastPoint[reductor(i,j+1,L)].U+lastPoint[reductor(i,j,L)].U)/2.)*(lastPoint[reductor(i,j+1,L)].U-lastPoint[reductor(i,j,L)].U)/lastPoint[reductor(i,j,L)].dy*lastPoint[reductor(i,j,L)].dy-
+				lambda((lastPoint[reductor(i,j-1,L)].U+lastPoint[reductor(i,j,L)].U)/2.)*(lastPoint[reductor(i,j,L)].U-lastPoint[reductor(i,j-1,L)].U)/lastPoint[reductor(i,j,L)].dy*lastPoint[reductor(i,j,L)].dy
+				);
 		
 }
 
@@ -53,20 +58,24 @@ int main(int argc, char *argv[]){
 	double L=1e-2;
 	int I1=100,I2=500,I3=1000;
 	double dx=L/(double)I1,dy=L/(double)I1;
-	unsigned long size=1000;//(long unsigned int)((L*L)/(dx*dy))
+	unsigned long size=100;//(long unsigned int)((L*L)/(dx*dy))
 	point *CurPoints,*PrePoints;
 	double T=argc>1?atoi(argv[1]):1.;//Получаем размер матрицы. По умолчанию 10.
-	CurPoints=malloc(sizeof(point)*size);
-	PrePoints=malloc(sizeof(point)*size);
+	CurPoints=malloc(sizeof(point)*size*size);
+	PrePoints=malloc(sizeof(point)*size*size);
 	
-	for(int i=0;i<size;i++){
-		PrePoints[i].X=CurPoints[i].X=(double)i*0.1;
-		PrePoints[i].Y=CurPoints[i].Y=(double)i*0.1;
+	for(int i=0;i<size;++i){
+		for(int j=0;j<size;++j){
+			PrePoints[reductor(i,j,size)].X=CurPoints[reductor(i,j,size)].X=(double)i*0.1;
+			PrePoints[reductor(i,j,size)].Y=CurPoints[reductor(i,j,size)].Y=(double)i*0.1;
+		}
 	}
+	for(int i=0;i<size*size;++i){
+		PrePoints[i].U=u0(PrePoints[i].X,PrePoints[i].Y);
 	
-	
+	PrePoints[i].dx=PrePoints[i].dy=CurPoints[i].dt=0.1;}
 	t=clock();
-	M_U(CurPoints,PrePoints,size);
+	M_U(CurPoints,PrePoints,size-1,size-1,size-1);
 	
 	
 	
@@ -75,6 +84,7 @@ int main(int argc, char *argv[]){
 		printf("% lf %lf %lf\n",CurPoints[i].X,CurPoints[i].Y,CurPoints[i].U);
 	}
 	fprintf(stderr,"\ndx %lf dy %lf time %lf\n",dx,dy,((float)t)/CLOCKS_PER_SEC);
-	
+	free(CurPoints);
+	free(PrePoints);
 	return 0;
 }
