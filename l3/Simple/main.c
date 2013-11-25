@@ -38,8 +38,8 @@ inline double u0(double x,double y){
 
 
 void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L){
-	for(int i=0;i<lx;++i)
-		for(int j=0;j<ly;++j)
+	for(int i=1;i<lx;++i)
+		for(int j=1;j<ly;++j)
 			curPoint[reductor(i,j,L)].U=
 				lastPoint[reductor(i,j,L)].U+
 				(curPoint[reductor(i,j,L)].dt/(c(lastPoint[reductor(i,j,L)].U)*rho(lastPoint[reductor(i,j,L)].U)))*
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
 	double L=1e-2;
 	int I1=100,I2=500,I3=1000;
 	double dx=L/(double)I1,dy=L/(double)I1;
-	unsigned long size=100;//(long unsigned int)((L*L)/(dx*dy))
+	unsigned long size=(long unsigned int)(L/dx);//(long unsigned int)((L*L)/(dx*dy))
 	point *CurPoints,*PrePoints;
 	double T=argc>1?atoi(argv[1]):1.;//Получаем размер матрицы. По умолчанию 10.
 	CurPoints=malloc(sizeof(point)*size*size);
@@ -66,17 +66,22 @@ int main(int argc, char *argv[]){
 	
 	for(int i=0;i<size;++i){
 		for(int j=0;j<size;++j){
-			PrePoints[reductor(i,j,size)].X=CurPoints[reductor(i,j,size)].X=(double)i*0.1;
-			PrePoints[reductor(i,j,size)].Y=CurPoints[reductor(i,j,size)].Y=(double)i*0.1;
+			PrePoints[reductor(i,j,size)].X=CurPoints[reductor(i,j,size)].X=(double)i*dx;
+			PrePoints[reductor(i,j,size)].Y=CurPoints[reductor(i,j,size)].Y=(double)i*dy;
 		}
 	}
+	
 	for(int i=0;i<size*size;++i){
 		PrePoints[i].U=u0(PrePoints[i].X,PrePoints[i].Y);
 	
 	PrePoints[i].dx=PrePoints[i].dy=CurPoints[i].dt=0.1;}
 	t=clock();
-	M_U(CurPoints,PrePoints,size-1,size-1,size-1);
-	
+	for(double tau=0.;tau<;tau=+0.1){
+		for(int i=0;i<size;++i){
+			PrePoints[reductor(0,i,size)].U=
+		}
+		M_U(CurPoints,PrePoints,size-1,size-1,size-1);
+	}
 	
 	
 	t=clock()-t;
