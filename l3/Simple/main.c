@@ -4,6 +4,7 @@
 #include <time.h>
 #include <math.h>
 #define M_PI 3.14159265358979323846
+#define N_K 0.00001864471911
 struct Point{
 	double X,Y,U,dx,dy,dt;
 	int Tstep;
@@ -80,6 +81,7 @@ int main(int argc, char *argv[]){
 	double dx=L/(double)I1,dy=L/(double)I1;
 	double curx=0.,cury=0.;
 	unsigned long size=(long unsigned int)(L/dx);//(long unsigned int)((L*L)/(dx*dy))
+	double dt = 0.9*dx*dx/N_K;
 	point *CurPoints,*PrePoints;
 	double T=argc>1?atoi(argv[1]):1.;//Получаем размер матрицы. По умолчанию 10.
 	CurPoints=malloc(sizeof(point)*size*size);
@@ -103,7 +105,7 @@ int main(int argc, char *argv[]){
 	PrePoints[i].dx=PrePoints[i].dy=CurPoints[i].dt=0.1;}
 	t=clock();
 	fprintf(file,"\"TStep\";\"x\";\"y\";\"U\";\"dt\"\n");
-	for(double tau=0.;tau<1.;tau+=0.01){
+	for(double tau=0.;tau<T;tau+=0.1){
 		for(int i=0;i<size;++i){
 			PrePoints[reductor(0,i,size)].U=mu1(PrePoints[reductor(0,i,size)].Y,tau);
 			PrePoints[reductor(size-1,i,size)].U=mu2(PrePoints[reductor(size-1,i,size)].Y,tau);
