@@ -2,5 +2,6 @@
 *.ko
 *.d
 *.obj
+*.csv
 
-l2/Parallel/bin/*.*
+l2/Parallel/bin/*
