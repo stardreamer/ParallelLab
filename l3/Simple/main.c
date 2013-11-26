@@ -14,6 +14,10 @@ inline double lambda(double u) __attribute__((always_inline));
 inline double rho(double u) __attribute__((always_inline));
 inline double c(double u) __attribute__((always_inline));
 inline double u0(double x,double y) __attribute__((always_inline));
+inline double mu1(double y, double tau) __attribute__((always_inline));
+inline double mu2(double y, double tau) __attribute__((always_inline));
+inline double mu3(double x, double tau) __attribute__((always_inline));
+inline double mu4(double x, double tau) __attribute__((always_inline));
 inline int reductor(int i,int j,int l) __attribute__((always_inline));
 
 inline int reductor(int i,int j,int l){
@@ -36,6 +40,21 @@ inline double u0(double x,double y){
 	return (300.+400.*x)*(sin(M_PI*y)+1.);
 }
 
+inline double mu1(double y, double tau){
+	return 300.+700.*tau/(y+1.);
+}
+
+inline double mu2(double y, double tau){
+	return 300.*exp(-0.125*y*tau);
+}
+
+inline double mu3(double x, double tau){
+	return 340.*x+(1.-x)*(300.+700.*tau);
+}
+
+inline double mu4(double x, double tau){
+	return 340.*x*exp(-0.125*tau)+(1.-x)*(300.+350.*tau);
+}
 
 void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L){
 	for(int i=1;i<lx;++i)
@@ -54,21 +73,28 @@ void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L){
 
 
 int main(int argc, char *argv[]){
+	FILE *file; 
 	clock_t t;//Время
 	double L=1e-2;
 	int I1=100,I2=500,I3=1000;
 	double dx=L/(double)I1,dy=L/(double)I1;
+	double curx=0.,cury=0.;
 	unsigned long size=(long unsigned int)(L/dx);//(long unsigned int)((L*L)/(dx*dy))
 	point *CurPoints,*PrePoints;
 	double T=argc>1?atoi(argv[1]):1.;//Получаем размер матрицы. По умолчанию 10.
 	CurPoints=malloc(sizeof(point)*size*size);
 	PrePoints=malloc(sizeof(point)*size*size);
-	
+	file = fopen("result.csv","w");
 	for(int i=0;i<size;++i){
 		for(int j=0;j<size;++j){
-			PrePoints[reductor(i,j,size)].X=CurPoints[reductor(i,j,size)].X=(double)i*dx;
-			PrePoints[reductor(i,j,size)].Y=CurPoints[reductor(i,j,size)].Y=(double)i*dy;
+			PrePoints[reductor(i,j,size)].X=CurPoints[reductor(i,j,size)].X+=curx;
+			PrePoints[reductor(i,j,size)].Y=CurPoints[reductor(i,j,size)].Y=cury;
+			PrePoints[reductor(i,j,size)].Tstep=CurPoints[reductor(i,j,size)].Tstep=0;
+			curx+=dx;
 		}
+		curx=0.;
+		cury+=dy;
+
 	}
 	
 	for(int i=0;i<size*size;++i){
@@ -76,19 +102,33 @@ int main(int argc, char *argv[]){
 	
 	PrePoints[i].dx=PrePoints[i].dy=CurPoints[i].dt=0.1;}
 	t=clock();
-	for(double tau=0.;tau<;tau=+0.1){
+	fprintf(file,"\"TStep\";\"x\";\"y\";\"U\";\"dt\"\n");
+	for(double tau=0.;tau<1.;tau+=0.01){
 		for(int i=0;i<size;++i){
-			PrePoints[reductor(0,i,size)].U=
+			PrePoints[reductor(0,i,size)].U=mu1(PrePoints[reductor(0,i,size)].Y,tau);
+			PrePoints[reductor(size-1,i,size)].U=mu2(PrePoints[reductor(size-1,i,size)].Y,tau);
+			PrePoints[reductor(i,0,size)].U=mu3(PrePoints[reductor(i,0,size)].X,tau);
+			PrePoints[reductor(i,size-1,size)].U=mu4(PrePoints[reductor(i,size-1,size)].X,tau);
 		}
-		M_U(CurPoints,PrePoints,size-1,size-1,size-1);
+		
+		M_U(CurPoints,PrePoints,size-1,size-1,size);
+		
+		for(int i=0;i<size*size;++i){
+			fprintf(file,"%i;%lf;%lf;%lf;%lf\n",PrePoints[i].Tstep,PrePoints[i].X,PrePoints[i].Y,PrePoints[i].U,PrePoints[i].dt);
+			PrePoints[i].U=CurPoints[i].U;
+			PrePoints[i].dt=tau;
+			++PrePoints[i].Tstep;
+		}
+
 	}
 	
 	
 	t=clock()-t;
-	for(int i=0;i<size;i++){
+	/*for(int i=0;i<size;i++){
 		printf("% lf %lf %lf\n",CurPoints[i].X,CurPoints[i].Y,CurPoints[i].U);
-	}
-	fprintf(stderr,"\ndx %lf dy %lf time %lf\n",dx,dy,((float)t)/CLOCKS_PER_SEC);
+	}*/
+	fclose(file);
+	fprintf(stderr,"\nTime %lf\n",((float)t)/CLOCKS_PER_SEC);
 	free(CurPoints);
 	free(PrePoints);
 	return 0;
