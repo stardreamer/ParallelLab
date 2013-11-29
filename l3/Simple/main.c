@@ -58,24 +58,24 @@ inline double mu4(double x, double tau){
 	return 340.*x*exp(-0.125*tau)+(1.-x)*(300.+350.*tau);
 }
 
-void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L,double dt){
+void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L,double dt,double T,double Len){
 	for(int i=1;i<lx;++i)
 		for(int j=1;j<ly;++j)
 			curPoint[reductor(i,j,L)].U=
 				lastPoint[reductor(i,j,L)].U+
-				(dt/(c(lastPoint[reductor(i,j,L)].U)*rho(lastPoint[reductor(i,j,L)].U)))*
+				(T*dt/(c(lastPoint[reductor(i,j,L)].U)*rho(lastPoint[reductor(i,j,L)].U)))*
 				(
 				lambda((lastPoint[reductor(i+1,j,L)].U+lastPoint[reductor(i,j,L)].U)/2.)*(lastPoint[reductor(i+1,j,L)].U-lastPoint[reductor(i,j,L)].U)/lastPoint[reductor(i,j,L)].dx*lastPoint[reductor(i,j,L)].dx-
 				lambda((lastPoint[reductor(i-1,j,L)].U+lastPoint[reductor(i,j,L)].U)/2.)*(lastPoint[reductor(i,j,L)].U-lastPoint[reductor(i-1,j,L)].U)/lastPoint[reductor(i,j,L)].dx*lastPoint[reductor(i,j,L)].dx+
 				lambda((lastPoint[reductor(i,j+1,L)].U+lastPoint[reductor(i,j,L)].U)/2.)*(lastPoint[reductor(i,j+1,L)].U-lastPoint[reductor(i,j,L)].U)/lastPoint[reductor(i,j,L)].dy*lastPoint[reductor(i,j,L)].dy-
 				lambda((lastPoint[reductor(i,j-1,L)].U+lastPoint[reductor(i,j,L)].U)/2.)*(lastPoint[reductor(i,j,L)].U-lastPoint[reductor(i,j-1,L)].U)/lastPoint[reductor(i,j,L)].dy*lastPoint[reductor(i,j,L)].dy
 				);
-		
+
 }
 
 
 int main(int argc, char *argv[]){
-	FILE *file; 
+	FILE *file;
 	clock_t t;//Время
 	int counter=0;
 	double L=1e-2;
@@ -89,8 +89,8 @@ int main(int argc, char *argv[]){
 	CurPoints=malloc(sizeof(point)*size*size);
 	PrePoints=malloc(sizeof(point)*size*size);
 	file = fopen("results.csv","w");
-	int dfr = (int)(T/dt)/NFRAMES; 
-	
+	int dfr = (int)(T/dt)/NFRAMES;
+
 	for(int i=0;i<size;++i){
 		for(int j=0;j<size;++j){
 			PrePoints[reductor(i,j,size)].X=CurPoints[reductor(i,j,size)].X+=curx;
@@ -102,10 +102,10 @@ int main(int argc, char *argv[]){
 		cury+=dy;
 
 	}
-	
+
 	for(int i=0;i<size*size;++i){
 		PrePoints[i].U=u0(PrePoints[i].X/L,PrePoints[i].Y/L);
-	
+
 	PrePoints[i].dx=PrePoints[i].dy=CurPoints[i].dt=0.1;}
 	t=clock();
 	fprintf(file,"\"TStep\";\"x\";\"y\";\"U\";\"dt\"\n");
@@ -116,9 +116,9 @@ int main(int argc, char *argv[]){
 			PrePoints[reductor(i,0,size)].U=mu1(PrePoints[reductor(i,0,size)].Y/L,tau/T);
 			PrePoints[reductor(i,size-1,size)].U=mu2(PrePoints[reductor(i,size-1,size)].Y/L,tau/T);
 		}
-		
-		M_U(CurPoints,PrePoints,size-1,size-1,size,dt);
-		
+
+		M_U(CurPoints,PrePoints,size-1,size-1,size,dt,T,L);
+
 		for(int i=0;i<size*size;++i){
 			if(dfr == 0){
 				fprintf(file,"%i;%lf;%lf;%lf;%lf\n",PrePoints[i].Tstep,PrePoints[i].X,PrePoints[i].Y,PrePoints[i].U,PrePoints[i].dt);
@@ -130,15 +130,14 @@ int main(int argc, char *argv[]){
 					fprintf(file,"%i;%lf;%lf;%lf;%lf\n",PrePoints[i].Tstep,PrePoints[i].X,PrePoints[i].Y,PrePoints[i].U,PrePoints[i].dt);
 				}
 			}
-				
 			PrePoints[i].U=CurPoints[i].U;
 			PrePoints[i].dt=tau;
 			++PrePoints[i].Tstep;
 		}
 
 	}
-	
-	
+
+
 	t=clock()-t;
 	/*for(int i=0;i<size;i++){
 		printf("% lf %lf %lf\n",CurPoints[i].X,CurPoints[i].Y,CurPoints[i].U);

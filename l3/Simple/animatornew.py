@@ -22,12 +22,16 @@ def animatorFunc(filelist,moviename):
         for time in sorted(set(TStep)):
             fname = '_tmp%04d.png' % counter
             Ubuf = U[TStep[:] == time]
-           # print(len(xbuf)," ", len(ybuf)," ",len(Ubuf))
+            #print(len(xbuf)," ", len(ybuf)," ",len(Ubuf))
             xi = np.linspace(xbuf.min(), xbuf.max(), len(set(xbuf)))
             yi = np.linspace(ybuf.min(), ybuf.max(), len(set(ybuf)))
-            ui = griddata(xbuf, ybuf, Ubuf, xi, yi, interp='linear')
+            ui = griddata(xbuf, ybuf, Ubuf, xi, yi, interp='nn')
+            if int(Ubuf.max()-Ubuf.min())<1000:
+                lev = int(Ubuf.max()-Ubuf.min())
+            else:
+                lev = 1000
             plt.clf()
-            plt.contourf(xi, yi, ui, 100, linewidth=1)
+            plt.contourf(xi, yi, ui, lev, vmin=100, vmax=1400, linewidth=1)
             plt.xlim(xbuf.min(), xbuf.max())
             plt.ylim(ybuf.min(), ybuf.max())
             curtime = dt[TStep[:] == time]
@@ -38,7 +42,7 @@ def animatorFunc(filelist,moviename):
             counter += 1
         fcounter += 1
     print("Combining frames into video:")
-    os.system("mencoder 'mf://_tmp*.png' -mf type=png:fps=10 -ovc lavc -lavcopts vcodec=wmv2 -oac copy -o " + moviename + ".avi")
+    os.system("mencoder 'mf://_tmp*.png' -mf type=png:fps=30 -ovc lavc -lavcopts vcodec=wmv2 -oac copy -o " + moviename + ".avi")
     # cleanup
     for fname in files: os.remove(fname)
 
