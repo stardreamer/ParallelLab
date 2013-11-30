@@ -51,19 +51,20 @@ double core(double T,double L,int I,int NFRAMES){
 	
 	Build_derived_type_data(PrePoints,&data_type);
 	
-	endPoint=&PrePoints[reductor(0,sizeL,sizeC)];
+	endPoint=&PrePoints[reductor(sizeL,0,sizeC)];
 	
 	dfr = (int)(T/dt)/NFRAMES;
 
 		file = fopen("results.csv","a");
+			setvbuf(file, NULL, _IONBF, 0);
 	if(rank == 0){
 		fprintf(file,"\"TStep\";\"x\";\"y\";\"U\";\"T\"\n");
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 	
-	setvbuf(file, NULL, _IONBF, 0);
+
 	//строим сетку
-	for(unsigned long int i=0;i<sizeL;++i){
+	for(unsigned long int i=0;i<sizeL+1;++i){
 		for(unsigned long int j=0;j<sizeC;++j){
 			PrePoints[reductor(i,j,sizeC)].X=CurPoints[reductor(i,j,sizeC)].X+=curx;
 			PrePoints[reductor(i,j,sizeC)].Y=CurPoints[reductor(i,j,sizeC)].Y=cury;
@@ -99,10 +100,16 @@ double core(double T,double L,int I,int NFRAMES){
 		M_U(CurPoints,PrePoints,sizeC-1,sizeL-1,sizeC,dt,T,dx,dy);
 		
 		//Сохранение результа
-		for(unsigned long int i=0;i<sizeL*sizeC;++i){
+		for(unsigned long int i=0;i<(sizeL+1)*sizeC;++i){
 			
+			
+			PrePoints[i].U=CurPoints[i].U;
+			PrePoints[i].T=tau;
+			
+		}
+		for(unsigned long int i=0;i<sizeL*sizeC;++i){
 			if(dfr == 0){
-				fprintf(file,"%i;%lf;%lf;%lf;%lf\n",Tstep,PrePoints[i].X,PrePoints[i].Y,PrePoints[i].U,PrePoints[i].T);
+				fprintf(file,"%i;%lf;%lf;%lf;%lf;%i\n",Tstep,PrePoints[i].X,PrePoints[i].Y,PrePoints[i].U,PrePoints[i].T,rank);
 				++counter;
 			}
 			else{
@@ -111,10 +118,6 @@ double core(double T,double L,int I,int NFRAMES){
 					fprintf(file,"%i;%lf;%lf;%lf;%lf\n",Tstep,PrePoints[i].X,PrePoints[i].Y,PrePoints[i].U,PrePoints[i].T);
 				}
 			}
-			
-			PrePoints[i].U=CurPoints[i].U;
-			PrePoints[i].T=tau;
-			
 		}
 		++Tstep;
 		if(rank < ProcNum-1)

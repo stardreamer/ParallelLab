@@ -3,5 +3,6 @@
 *.d
 *.obj
 *.csv
+*.gif
 
 l2/Parallel/bin/*

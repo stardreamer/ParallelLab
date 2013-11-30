@@ -31,8 +31,8 @@ def animatorFunc(filelist,moviename):
             else:
                 lev = 1000
             plt.clf()
-            plt.contourf(xi, yi, ui, lev, vmin=100, vmax=1400, linewidth=1)
-            #plt.pcolormesh(xi, yi, ui, vmin=100, vmax=1400)
+            #plt.contourf(xi, yi, ui, lev, vmin=100, vmax=1400, linewidth=1)
+            plt.pcolormesh(xi, yi, ui, vmin=100, vmax=1400)
             plt.xlim(xbuf.min(), xbuf.max())
             plt.ylim(ybuf.min(), ybuf.max())
             curtime = dt[TStep[:] == time]
