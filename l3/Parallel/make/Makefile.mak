@@ -6,7 +6,7 @@ OBJDIR := obj
 BINDIR := bin
 
 CC := mpicc
-FLAGS := -Wall -pedantic -ffreestanding -Wstrict-overflow=4 -Wformat-security -Wextra -Wfloat-equal -Wundef -Wshadow -O3  -c -std=c99 -MD
+FLAGS := -Wall -pedantic -ffreestanding -Wstrict-overflow=4 -Wformat-security -Wextra -Wfloat-equal -Wundef -Wshadow -O2  -c -std=c99 -MD
 BINDIR_REL := $(addprefix ../, $(BINDIR))
 
 SRCDIR_REL := $(addprefix ../, $(SRCDIR))
@@ -22,7 +22,7 @@ default:
 	@echo -e "\e[0;33mmake clean\e[0;32m - чистка объектных файлов"
 	@echo -e "\e[0;33mmake delete\e[0;32m - удаление исполняемых файлов" 
 	
-mpiConductivity:$(BINDIR_REL)/mpimatrix $(OBJFILES)  
+mpiConductivity:$(BINDIR_REL)/mpiConductivity $(OBJFILES)  
 	@echo -e "Компиляция mpi программы успешна\n"
 	
 
