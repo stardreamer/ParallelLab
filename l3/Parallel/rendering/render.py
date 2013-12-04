@@ -4,7 +4,7 @@ from animatornew import animatorFunc
 import os
 
 
-filelist = cutter("results.csv", 10)
+filelist = cutter("results.csv", 100)
 
 animatorFunc(filelist, "HeatMap")
 os.system("rm -f output* Heat.gif")

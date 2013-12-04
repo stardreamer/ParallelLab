@@ -5,9 +5,7 @@ from itertools import zip_longest
 
 def get_index(list,elem):
     idx = None
-    for sublist in list:
-        if elem in sublist:
-            idx = list.index(sublist)
+    idx = list.index(elem)
     return idx
 
 def chunks(lst, count):
@@ -26,7 +24,7 @@ def cutter(filename, numtimes):
                 times.append(int(buf[0]))
         linenumbers += 1
 
-    times = chunks(times, numtimes)
+    #times = chunks(times, numtimes)
     files = ["output%d.csv" % i for i in range(len(times))]
     pfiles = [open(files[i], "wb") for i in range(len(times))]
 

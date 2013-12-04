@@ -1,6 +1,6 @@
 #ifndef CORE_H
 #define CODE_H
-
+#include "fileworker.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -13,7 +13,7 @@
 
 
 struct Point{
-	double X,Y,U,T;
+	double X,Y,U;
 };
 struct Border{
 	int left,right,length;
