@@ -13,7 +13,7 @@ double core(double T,double L,int I,int NFRAMES){
 	double t;//Время
 	
 	point *CurPoints,*PrePoints;//точка сетки
-	double dx=L/(double)(I),dy=L/(double)(I); //шаги
+	double dx=L/(double)(I-1),dy=L/(double)(I-1); //шаги
 	double curx=0.,cury=0.;
 	int ProcNum=0,rank=0;
 	unsigned long int sizeC=(long unsigned int)(L/dx),sizeL=0;
@@ -106,11 +106,6 @@ double core(double T,double L,int I,int NFRAMES){
 				PrePoints[i].U=CurPoints[i].U=u0(PrePoints[i].X/L,PrePoints[i].Y/L);
 	
 	for(double tau=0.;tau<T;tau+=dt){
-		//Вывод в файл
-		if(rank==0)
-			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(0,0,sizeC)],sizeL*sizeC,dfr);
-		else
-			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(1,0,sizeC)],sizeL*sizeC,dfr);
 		
 		//Обмен сообщениями
 		if(rank < ProcNum-1 && rank!=0)
@@ -148,6 +143,13 @@ double core(double T,double L,int I,int NFRAMES){
 				PrePoints[reductor(i,sizeC-1,sizeC)].U=mu2(PrePoints[reductor(i,sizeC-1,sizeC)].Y/L,tau/T);
 			}
 		}
+		
+		//Вывод в файл
+		if(rank==0)
+			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(0,0,sizeC)],sizeL*sizeC,dfr);
+		else
+			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(1,0,sizeC)],sizeL*sizeC,dfr);
+		
 		//Разностная схема
 		if(rank == 0 || rank != ProcNum-1)
 			M_U(CurPoints,PrePoints,sizeC-1,sizeL,sizeC,dt,T,dx,dy);
@@ -156,11 +158,17 @@ double core(double T,double L,int I,int NFRAMES){
 		
 		//Сохранение результа
 		if(rank==0)
-			for(unsigned long int i=0;i<(sizeL)*sizeC;++i)
-				PrePoints[i].U=CurPoints[i].U;
+			for(unsigned long int i=0;i<sizeL;++i){
+				for(unsigned long int j=0;j<sizeC;++j){
+				PrePoints[reductor(i,j,sizeC)].U=CurPoints[reductor(i,j,sizeC)].U;
+			}
+		}
 		else
-			for(unsigned long int i=sizeC;i<(sizeL+1)*sizeC;++i)
-				PrePoints[i].U=CurPoints[i].U;
+			for(unsigned long int i=1;i<sizeL+1;++i){
+				for(unsigned long int j=0;j<sizeC;++j){
+				PrePoints[reductor(i,j,sizeC)].U=CurPoints[reductor(i,j,sizeC)].U;
+			}
+		}
 	
 		
 		Tstep++;
