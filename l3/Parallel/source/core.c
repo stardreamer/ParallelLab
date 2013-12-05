@@ -107,6 +107,7 @@ double core(double T,double L,int I,int NFRAMES){
 	
 	for(double tau=0.;tau<T;tau+=dt){
 		
+		
 		//Обмен сообщениями
 		if(rank < ProcNum-1 && rank!=0)
 			MPI_Send(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,0,MPI_COMM_WORLD);
@@ -151,7 +152,7 @@ double core(double T,double L,int I,int NFRAMES){
 			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(1,0,sizeC)],sizeL*sizeC,dfr);
 		
 		//Разностная схема
-		if(rank == 0 || rank != ProcNum-1)
+		if(rank == 0 || rank == ProcNum-1)
 			M_U(CurPoints,PrePoints,sizeC-1,sizeL,sizeC,dt,T,dx,dy);
 		else
 			M_U(CurPoints,PrePoints,sizeC-1,sizeL+1,sizeC,dt,T,dx,dy);
