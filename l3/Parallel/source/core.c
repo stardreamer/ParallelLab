@@ -7,13 +7,21 @@ void cinematicPrintPoint(FILE *file,int timestep,double T,point *startPoint, lon
 		cinematicTimeStamp(file,timestep,(*temp).X,(*temp).Y,(*temp).U,T,fraps);
 }
 
+void gnuPrintPoint(FILE *file,point *startPoint, long long int size){
+	point *temp;
+	temp=startPoint;
+	for(long long int i=0;i<size;temp++,++i)
+		fprintf(file,"%lf %lf %lf\n",(*temp).Y,(*temp).X,(*temp).U);
+}
+
 double core(double T,double L,int I,int NFRAMES){
 
 	FILE *file;//Выходной файл
+	FILE *gnuplot;
 	double t;//Время
 	
 	point *CurPoints,*PrePoints;//точка сетки
-	double dx=L/(double)(I-1),dy=L/(double)(I-1); //шаги
+	double dx=L/(double)(I),dy=L/(double)(I); //шаги
 	double curx=0.,cury=0.;
 	int ProcNum=0,rank=0;
 	unsigned long int sizeC=(long unsigned int)(L/dx),sizeL=0;
@@ -65,7 +73,14 @@ double core(double T,double L,int I,int NFRAMES){
 	
 	dfr = (int)(T/dt)/NFRAMES;
 	
-	openFile(&file,"results.csv",rank);
+	if(rank==0){
+		deleteFile("results.csv");
+		deleteFile("gnuresults.csv");
+	}
+	
+	MPI_Barrier(MPI_COMM_WORLD);
+	openFile(&file,"results.csv",rank,PYTHONPLOT_F);
+	openFile(&gnuplot,"gnuresults.csv",rank,GNUPLOT_F);
 	MPI_Barrier(MPI_COMM_WORLD);
 	
 
@@ -125,31 +140,40 @@ double core(double T,double L,int I,int NFRAMES){
 			if(rank==0)
 				MPI_Recv(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
 		
-		//Задание граничных условий
-		if(rank==0){
-			for(unsigned long int i=0;i<sizeC;++i)
-				PrePoints[reductor(0,i,sizeC)].U=mu3(PrePoints[reductor(0,i,sizeC)].X/L,tau/T);
-			for(unsigned long int i=0;i<sizeL;++i){
-				PrePoints[reductor(i,0,sizeC)].U=mu1(PrePoints[reductor(i,0,sizeC)].Y/L,tau/T);
-				PrePoints[reductor(i,sizeC-1,sizeC)].U=mu2(PrePoints[reductor(i,sizeC-1,sizeC)].Y/L,tau/T);
-			}
-		}
-		else{
-			if(rank==ProcNum-1)
-				for(unsigned long int i=0;i<sizeC;++i)
-					PrePoints[reductor(sizeL,i,sizeC)].U=mu4(PrePoints[reductor(sizeL,i,sizeC)].X/L,tau/T);	
-			
-			for(unsigned long int i=1;i<sizeL+1;++i){
-				PrePoints[reductor(i,0,sizeC)].U=mu1(PrePoints[reductor(i,0,sizeC)].Y/L,tau/T);
-				PrePoints[reductor(i,sizeC-1,sizeC)].U=mu2(PrePoints[reductor(i,sizeC-1,sizeC)].Y/L,tau/T);
-			}
-		}
-		
 		//Вывод в файл
 		if(rank==0)
 			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(0,0,sizeC)],sizeL*sizeC,dfr);
 		else
 			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(1,0,sizeC)],sizeL*sizeC,dfr);
+		
+		//Задание граничных условий
+		if(rank==0){
+			for(unsigned long int i=0;i<sizeC;++i){
+				PrePoints[reductor(0,i,sizeC)].U=mu3(PrePoints[reductor(0,i,sizeC)].X/L,tau/T);
+				CurPoints[reductor(0,i,sizeC)].U=PrePoints[reductor(0,i,sizeC)].U;
+				}
+			for(unsigned long int i=0;i<sizeL;++i){
+				PrePoints[reductor(i,0,sizeC)].U=mu1(PrePoints[reductor(i,0,sizeC)].Y/L,tau/T);
+				PrePoints[reductor(i,sizeC-1,sizeC)].U=mu2(PrePoints[reductor(i,sizeC-1,sizeC)].Y/L,tau/T);
+				CurPoints[reductor(i,0,sizeC)].U=PrePoints[reductor(i,0,sizeC)].U;
+				CurPoints[reductor(i,sizeC-1,sizeC)].U=PrePoints[reductor(i,sizeC-1,sizeC)].U;
+			}
+		}
+		else{
+			if(rank==ProcNum-1)
+				for(unsigned long int i=0;i<sizeC;++i){
+					PrePoints[reductor(sizeL,i,sizeC)].U=mu4(PrePoints[reductor(sizeL,i,sizeC)].X/L,tau/T);	
+					CurPoints[reductor(sizeL,i,sizeC)].U=PrePoints[reductor(sizeL,i,sizeC)].U;
+				}
+			
+			for(unsigned long int i=1;i<sizeL+1;++i){
+				PrePoints[reductor(i,0,sizeC)].U=mu1(PrePoints[reductor(i,0,sizeC)].Y/L,tau/T);
+				PrePoints[reductor(i,sizeC-1,sizeC)].U=mu2(PrePoints[reductor(i,sizeC-1,sizeC)].Y/L,tau/T);
+				CurPoints[reductor(i,0,sizeC)].U=PrePoints[reductor(i,0,sizeC)].U;
+				CurPoints[reductor(i,sizeC-1,sizeC)].U=PrePoints[reductor(i,sizeC-1,sizeC)].U;
+			}
+		}
+		
 		
 		//Разностная схема
 		if(rank == 0 || rank == ProcNum-1)
@@ -175,8 +199,19 @@ double core(double T,double L,int I,int NFRAMES){
 		Tstep++;
 	}
 	
+	
 	t=MPI_Wtime()-t;
-
+	
+	for(int i=0;i< ProcNum;i++){
+		if(rank==i){
+			if(i==0)
+				gnuPrintPoint(gnuplot,&PrePoints[reductor(0,0,sizeC)],sizeL*sizeC);
+			else
+				gnuPrintPoint(gnuplot,&PrePoints[reductor(1,0,sizeC)],sizeL*sizeC);
+		}
+		MPI_Barrier(MPI_COMM_WORLD);
+	}
+	closeFile(&gnuplot);
 	closeFile(&file);
 	free(CurPoints);
 	free(PrePoints);

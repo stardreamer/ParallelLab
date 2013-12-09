@@ -14,9 +14,9 @@ def chunks(lst, count):
 
 def cutter(filename, numtimes):
     times = []
+    print("Opening %s:" % filename)
     ff = fileinput.FileInput(filename)
     lasttime = None
-    linenumbers = 1
     tempfile = None
     print("Looking through %s: matching times" % filename)
     for line in ff:
@@ -24,12 +24,12 @@ def cutter(filename, numtimes):
         if ff.filelineno() != 1:
             if int(buf[0]) not in times:
                 times.append(int(buf[0]))
-        linenumbers += 1
+    ff.close()
     print("Finished with matching!\n Preparing to print!")
     #times = chunks(times, numtimes)
     files = ["output%d.csv" % i for i in range(len(times))]
     #pfiles = [open(files[i], "wb") for i in range(len(times))]
-
+    print("Reopening %s:" % filename)
     ff = fileinput.FileInput(filename)
     print("Starting printing information to file. \n It'll take a while, go and drink some tea")
     for line in ff:

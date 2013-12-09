@@ -1,5 +1,6 @@
 #ifndef CORE_H
 #define CODE_H
+
 #include "fileworker.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +8,7 @@
 #include <mpi.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #define M_PI 3.14159265358979323846
 #define N_K 0.00001864471911

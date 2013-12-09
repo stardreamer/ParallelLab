@@ -36,9 +36,7 @@
         <entry file="file://$USER_HOME$/PycharmProjects/testPytables/MyPyTables.py">
           <provider selected="true" editor-type-id="text-editor">
             <state line="7" column="0" selection-start="118" selection-end="118" vertical-scroll-proportion="0.0" vertical-offset="18" max-vertical-offset="1080">
-              <folding>
-                <element signature="e#23#36#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -46,7 +44,7 @@
       <file leaf-file-name="animatornew.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/animatornew.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1170">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1224">
               <folding />
             </state>
           </provider>
@@ -55,7 +53,7 @@
       <file leaf-file-name="cutter.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cutter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="44" column="16" selection-start="1397" selection-end="1397" vertical-scroll-proportion="0.54924875" vertical-offset="427" max-vertical-offset="1044">
+            <state line="31" column="14" selection-start="918" selection-end="918" vertical-scroll-proportion="0.6327212" vertical-offset="143" max-vertical-offset="1044">
               <folding />
             </state>
           </provider>
@@ -110,6 +108,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -130,7 +129,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -447,9 +445,7 @@
     <entry file="file://$USER_HOME$/PycharmProjects/testPytables/MyPyTables.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="7" column="0" selection-start="118" selection-end="118" vertical-scroll-proportion="0.0" vertical-offset="18" max-vertical-offset="1080">
-          <folding>
-            <element signature="e#23#36#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -462,7 +458,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cutter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="16" selection-start="1397" selection-end="1397" vertical-scroll-proportion="0.54924875" vertical-offset="427" max-vertical-offset="1044">
+        <state line="31" column="14" selection-start="918" selection-end="918" vertical-scroll-proportion="0.6327212" vertical-offset="143" max-vertical-offset="1044">
           <folding />
         </state>
       </provider>

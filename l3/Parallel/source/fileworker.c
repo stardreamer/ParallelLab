@@ -1,9 +1,13 @@
 #include "fileworker.h"
 
-void openFile(FILE **file,const char* filename, int rank){
+void deleteFile(const char* filename){
+		unlink(filename);
+}
+void openFile(FILE **file,const char* filename, int rank,int param){
+
 	*file = fopen(filename,"a");
 		setvbuf(*file, NULL, _IONBF, 0);
-	if(rank == 0)
+	if(rank == 0 && param == PYTHONPLOT_F)
 		fprintf(*file,"\"TStep\";\"x\";\"y\";\"U\";\"T\"\n");
 }
 
