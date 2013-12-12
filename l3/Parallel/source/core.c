@@ -20,8 +20,8 @@ double core(double T,double L,int I,int NFRAMES){
 	FILE *gnuplot;
 	double t;//Время
 	
-	point *CurPoints,*PrePoints;//точка сетки
-	double dx=L/(double)(I),dy=L/(double)(I); //шаги
+	point *CurPoints,*PrePoints,*bufPoints;//точка сетки
+	double dx=L/(double)(I-1),dy=L/(double)(I-1); //шаги
 	double curx=0.,cury=0.;
 	int ProcNum=0,rank=0;
 	unsigned long int sizeC=(long unsigned int)(L/dx),sizeL=0;
@@ -87,8 +87,8 @@ double core(double T,double L,int I,int NFRAMES){
 	//строим сетку
 	//TODO:Вынести в отдельную функцию
 	if(rank==0)
-	for(unsigned long int i=0;i<sizeL;++i){
-		for(unsigned long int j=0;j<sizeC;++j){
+	for(unsigned long int i=0;i<sizeL;i++){
+		for(unsigned long int j=0;j<sizeC;j++){
 			CurPoints[reductor(i,j,sizeC)].X+=curx;
 			PrePoints[reductor(i,j,sizeC)].X+=curx;
 			CurPoints[reductor(i,j,sizeC)].Y=cury;
@@ -99,8 +99,8 @@ double core(double T,double L,int I,int NFRAMES){
 		cury+=dy;
 	}
 	else
-	for(unsigned long int i=1;i<sizeL+1;++i){
-		for(unsigned long int j=0;j<sizeC;++j){
+	for(unsigned long int i=1;i<sizeL+1;i++){
+		for(unsigned long int j=0;j<sizeC;j++){
 			CurPoints[reductor(i,j,sizeC)].X+=curx;
 			PrePoints[reductor(i,j,sizeC)].X+=curx;
 			CurPoints[reductor(i,j,sizeC)].Y=cury;
@@ -114,45 +114,26 @@ double core(double T,double L,int I,int NFRAMES){
 	
 	//Начальные условия
 	if(rank==0)
-		for(unsigned long int i=0;i<(sizeL)*sizeC;++i)
-			PrePoints[i].U=CurPoints[i].U=u0(PrePoints[i].X/L,PrePoints[i].Y/L);
+		for(unsigned long int i=0;i<(sizeL)*sizeC;i++){
+			CurPoints[i].U=u0(PrePoints[i].X/L,PrePoints[i].Y/L);
+			PrePoints[i].U=CurPoints[i].U;
+		}
 	else
-		for(unsigned long int i=sizeC;i<(sizeL+1)*sizeC;++i)
-				PrePoints[i].U=CurPoints[i].U=u0(PrePoints[i].X/L,PrePoints[i].Y/L);
+		for(unsigned long int i=sizeC;i<(sizeL+1)*sizeC;i++){
+				CurPoints[i].U=u0(PrePoints[i].X/L,PrePoints[i].Y/L);
+				PrePoints[i].U=CurPoints[i].U;
+			}
+		
 	
-	for(double tau=0.;tau<T;tau+=dt){
-		
-		
-		//Обмен сообщениями
-		if(rank < ProcNum-1 && rank!=0)
-			MPI_Send(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,0,MPI_COMM_WORLD);
-		else
-			if(rank==0)
-				MPI_Send(&PrePoints[reductor(sizeL-1,0,sizeC)],sizeC,data_type,rank+1,0,MPI_COMM_WORLD);
-		if(rank>0)
-			MPI_Recv(&PrePoints[reductor(0,0,sizeC)],sizeC,data_type,rank-1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
-			
-		if(rank > 0)
-			MPI_Send(&PrePoints[reductor(1,0,sizeC)],sizeC,data_type,rank-1,0,MPI_COMM_WORLD);
-		if(rank < ProcNum-1 && rank!=0)
-			MPI_Recv(&PrePoints[reductor(sizeL+1,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
-		else
-			if(rank==0)
-				MPI_Recv(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
-		
-		//Вывод в файл
-		if(rank==0)
-			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(0,0,sizeC)],sizeL*sizeC,dfr);
-		else
-			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(1,0,sizeC)],sizeL*sizeC,dfr);
+	for(double tau=0;tau<T;tau+=dt){
 		
 		//Задание граничных условий
-		if(rank==0){
-			for(unsigned long int i=0;i<sizeC;++i){
+		if(rank==0 ){
+			for(unsigned long int i=0;i<sizeC;i++){
 				PrePoints[reductor(0,i,sizeC)].U=mu3(PrePoints[reductor(0,i,sizeC)].X/L,tau/T);
 				CurPoints[reductor(0,i,sizeC)].U=PrePoints[reductor(0,i,sizeC)].U;
 				}
-			for(unsigned long int i=0;i<sizeL;++i){
+			for(unsigned long int i=0;i<sizeL;i++){
 				PrePoints[reductor(i,0,sizeC)].U=mu1(PrePoints[reductor(i,0,sizeC)].Y/L,tau/T);
 				PrePoints[reductor(i,sizeC-1,sizeC)].U=mu2(PrePoints[reductor(i,sizeC-1,sizeC)].Y/L,tau/T);
 				CurPoints[reductor(i,0,sizeC)].U=PrePoints[reductor(i,0,sizeC)].U;
@@ -161,12 +142,12 @@ double core(double T,double L,int I,int NFRAMES){
 		}
 		else{
 			if(rank==ProcNum-1)
-				for(unsigned long int i=0;i<sizeC;++i){
+				for(unsigned long int i=0;i<sizeC;i++){
 					PrePoints[reductor(sizeL,i,sizeC)].U=mu4(PrePoints[reductor(sizeL,i,sizeC)].X/L,tau/T);	
 					CurPoints[reductor(sizeL,i,sizeC)].U=PrePoints[reductor(sizeL,i,sizeC)].U;
 				}
 			
-			for(unsigned long int i=1;i<sizeL+1;++i){
+			for(unsigned long int i=1;i<sizeL+1;i++){
 				PrePoints[reductor(i,0,sizeC)].U=mu1(PrePoints[reductor(i,0,sizeC)].Y/L,tau/T);
 				PrePoints[reductor(i,sizeC-1,sizeC)].U=mu2(PrePoints[reductor(i,sizeC-1,sizeC)].Y/L,tau/T);
 				CurPoints[reductor(i,0,sizeC)].U=PrePoints[reductor(i,0,sizeC)].U;
@@ -175,26 +156,56 @@ double core(double T,double L,int I,int NFRAMES){
 		}
 		
 		
+		//Обмен сообщениями
+		if(rank < (ProcNum-1) ){
+			if(rank!=0)
+				MPI_Send(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,0,MPI_COMM_WORLD);
+			else
+				MPI_Send(&PrePoints[reductor(sizeL-1,0,sizeC)],sizeC,data_type,rank+1,0,MPI_COMM_WORLD);
+		}
+		if(rank>0)
+			MPI_Recv(&PrePoints[reductor(0,0,sizeC)],sizeC,data_type,rank-1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
+			
+		if(rank > 0)
+			MPI_Send(&PrePoints[reductor(1,0,sizeC)],sizeC,data_type,rank-1,0,MPI_COMM_WORLD);
+		if(rank < ProcNum-1 ){
+			if(rank!=0)
+				MPI_Recv(&PrePoints[reductor(sizeL+1,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
+			else
+				MPI_Recv(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
+			}
+		
+		//Вывод в файл
+		if(rank==0)
+			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(0,0,sizeC)],sizeL*sizeC,dfr);
+		else
+			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(1,0,sizeC)],sizeL*sizeC,dfr);
+		
+		
 		//Разностная схема
 		if(rank == 0 || rank == ProcNum-1)
-			M_U(CurPoints,PrePoints,sizeC-1,sizeL,sizeC,dt,T,dx,dy);
+			M_U(CurPoints,PrePoints,sizeC-1,sizeL,sizeC,dt,T,L,dx,dy);
 		else
-			M_U(CurPoints,PrePoints,sizeC-1,sizeL+1,sizeC,dt,T,dx,dy);
+			M_U(CurPoints,PrePoints,sizeC-1,sizeL+1,sizeC,dt,T,L,dx,dy);
 		
 		//Сохранение результа
-		if(rank==0)
-			for(unsigned long int i=0;i<sizeL;++i){
-				for(unsigned long int j=0;j<sizeC;++j){
+		/*if(rank==0)
+			for(unsigned long int i=0;i<sizeL;i++){
+				for(unsigned long int j=0;j<sizeC;j++){
 				PrePoints[reductor(i,j,sizeC)].U=CurPoints[reductor(i,j,sizeC)].U;
 			}
 		}
 		else
-			for(unsigned long int i=1;i<sizeL+1;++i){
-				for(unsigned long int j=0;j<sizeC;++j){
+			for(unsigned long int i=1;i<sizeL+1;i++){
+				for(unsigned long int j=0;j<sizeC;j++){
 				PrePoints[reductor(i,j,sizeC)].U=CurPoints[reductor(i,j,sizeC)].U;
 			}
-		}
-	
+		}*/
+		
+		bufPoints=PrePoints;
+		PrePoints=CurPoints;
+		CurPoints=bufPoints;
+		
 		
 		Tstep++;
 	}

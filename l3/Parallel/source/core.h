@@ -40,24 +40,24 @@ inline double mu4(double x, double tau) __attribute__((always_inline));
 inline int reductor(int i,int j,int l) __attribute__((always_inline));
 
 void getBorder(border* borders,int N,int size);
-void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L,double dt,double T,double dx,double dy) ;
+void M_U(point *curPoint,point *lastPoint,int lx,int ly,int L,double dt,double T,double Len,double dx,double dy) ;
 
 
 
 inline double c(double u){
-	return 1./(2.25*1e-3-6.08*1e-10*u*u);
+	return 1./(2.25*1e-3 - 6.08*1e-10*u*u);
 }
 
 inline double u0(double x,double y){
-	return (300.+400.*x)*(sin(M_PI*y)+1.);
+	return (300.+40.*x)*(sinf(M_PI*y)+1.);
 }
 
 inline double mu1(double y, double tau){
-	return 300.+700.*tau/(y+1.);
+	return 300.*(sinf(M_PI*y)+1.)+700.*tau/(y+1.);
 }
 
 inline double mu2(double y, double tau){
-	return 300.*exp(-0.125*y*tau);
+	return 340.*expf(-0.125*y*tau)*(sin(M_PI*y)+1.);
 }
 
 inline double mu3(double x, double tau){
@@ -65,7 +65,7 @@ inline double mu3(double x, double tau){
 }
 
 inline double mu4(double x, double tau){
-	return 340.*x*exp(-0.125*tau)+(1.-x)*(300.+350.*tau);
+	return 340.*x*expf(-0.125*tau)+(1.-x)*(300.+350.*tau);
 }
 
 inline double lambda(double u){
