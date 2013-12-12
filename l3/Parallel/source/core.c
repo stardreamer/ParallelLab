@@ -139,6 +139,11 @@ double core(double T,double L,int I,int NFRAMES){
 				CurPoints[reductor(i,0,sizeC)].U=PrePoints[reductor(i,0,sizeC)].U;
 				CurPoints[reductor(i,sizeC-1,sizeC)].U=PrePoints[reductor(i,sizeC-1,sizeC)].U;
 			}
+			if(ProcNum == 1)
+				for(unsigned long int i=0;i<sizeC;i++){
+					PrePoints[reductor(sizeL,i,sizeC)].U=mu4(PrePoints[reductor(sizeL-1,i,sizeC)].X/L,tau/T);	
+					CurPoints[reductor(sizeL,i,sizeC)].U=PrePoints[reductor(sizeL-1,i,sizeC)].U;
+				}
 		}
 		else{
 			if(rank==ProcNum-1)
