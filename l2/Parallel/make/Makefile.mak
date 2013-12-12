@@ -6,7 +6,7 @@ OBJDIR := obj
 BINDIR := bin
 
 CC := mpicc
-
+FLAGS := -Wall -pedantic -ffreestanding -Wstrict-overflow=4 -Wformat-security -Wextra -Wfloat-equal -Wundef -Wshadow -O3  -c -std=c99 -MD
 BINDIR_REL := $(addprefix ../, $(BINDIR))
 
 SRCDIR_REL := $(addprefix ../, $(SRCDIR))
@@ -27,12 +27,12 @@ mpimatrix:$(BINDIR_REL)/mpimatrix $(OBJFILES)
 	
 
 $(BINDIR_REL)/mpimatrix: $(OBJFILES) 
-	$(CC) -Wall -lm $^ -o $@
+	$(CC) -Wall $^ -o $@ -lm
 
 	
 
 $(OBJDIR_REL)/%.o: $(SRCDIR_REL)/%.c
-	$(CC) $<  -Wall -pedantic -lm -O2 -c -std=c99 -MD $(addprefix -I, $(SRCDIR_REL)) -o $@ -pipe
+	$(CC) $<  $(FLAGS) $(addprefix -I, $(SRCDIR_REL)) -o $@ -pipe -lm
 	
 include  $(wildcard $(OBJDIR_REL)/*.d)
 #Все пользователи имеют право читать копируется в каталог
@@ -40,6 +40,7 @@ clean:
 	@rm -f $(OBJDIR_REL)/*.o $(OBJDIR_REL)/*.d
 	@rm -f $(OBJDIR_REL_S)/*.o $(OBJDIR_REL_S)/*.d
 	@rm -f $(OBJDIR_REL_D)/*.o $(OBJDIR_REL_D)/*.d
+	@rm -f $(BINDIR_REL)/*
 	@echo "Очистка завершена!"
 delete:
 	@echo "Клиент удалён!"

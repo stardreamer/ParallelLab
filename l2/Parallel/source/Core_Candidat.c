@@ -4,7 +4,7 @@ double Core_Candidat(double *a,double *b,double *c,border *borders,int L,int ran
 	int *displs/*указатель на смещения*/,*scounts/*указатель на число элеемнтов*/;
 	*sum=0.;/*Зануляем перед подсчетом*/
 	double wt=-MPI_Wtime();/*Засекаем время*/
-	
+	displs=scounts=NULL;
 	//Рассылаем границы разбиений(они идут друг за другом номера элементов соответствуют номерам процессов)
 	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
 	
@@ -13,6 +13,7 @@ double Core_Candidat(double *a,double *b,double *c,border *borders,int L,int ran
 		else        a=(double*)realloc(a,sizeof(double)*(*borders).length*L);//Если выделена, то перевыделяем
 		if(c==NULL) c=(double*)malloc(sizeof(double)*(*borders).length*L);//Получаем указатель на матрицу с
 		else        c=(double*)realloc(c,sizeof(double)*(*borders).length*L);//Если выделена, то перевыделяем
+		if(a==NULL || c==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
 		for(int i=0;i<(*borders).length*L;i++) c[i]=0.;//зануляем с
 	}
 	else{
@@ -39,5 +40,7 @@ double Core_Candidat(double *a,double *b,double *c,border *borders,int L,int ran
 	MPI_Reduce(sum,resultnorm,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 	
 	wt += MPI_Wtime();//замер времени
+	free(displs);
+	free(scounts);
 	return wt;//возвращаем время
 }

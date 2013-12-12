@@ -1,2 +1,8 @@
-/Parallel/bin/*
-/Parallel/obj/*
+*.o
+*.ko
+*.d
+*.obj
+*.csv
+*.gif
+
+l2/Parallel/bin/*

@@ -13,13 +13,13 @@ double fRand(){
 
 int main(int argc, char** argv){
 	double *a,*b,*c; //тут храним матрицы
-	a=b=c=NULL;//устанавливаем указатели в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
-	double *times;//указатель на время работы(массив на root на остальных память только под один элемент)
+	a=c=NULL;//устанавливаем указатели в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
+	double *times,timediff=0.;//указатель на время работы(массив на root на остальных память только под один элемент)
 	times=NULL;//устанавливаем указатель в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
 	border *borders; //границы разбиений
 	borders=NULL;//устанавливаем указатель в NULL(важно, чтобы не происходила реаллокация неизвестно чего)
 	int  N=0/*Число строк*/,L=0/*Число столбцов*/,N1/*Размерность a*/,N2/*Размерность b*/,N3/*Размерность c*/;
-	double sum=0./*Сумма квадратов*/,resultnorm=0./*Норма*/;
+	double sum=0./*Сумма квадратов*/,resultnorm=0./*Норма*/,normdiff=0.;
 	int rank/*id процесса*/,size/*Число процессов*/;
 	MPI_Datatype message_type/*Тут будет храниться представление структуры border*/;
 	
@@ -50,27 +50,42 @@ int main(int argc, char** argv){
 		a=(double*)malloc(sizeof(double)*N1);//Выделяем память
 		c=(double*)malloc(sizeof(double)*N3);//Получаем указатель на матрицу с
 		borders=(border*)realloc(borders,sizeof(border)*size);
+		if(borders==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
 		for(int i=0;i<N1;++i)	a[i]=fRand();//Заполняем матрицы псевдослучайными числами
 		getBorder(borders,N,size,SIMPLE_BREAK,NULL);
 	}
 	
 	(*times)=Core_Candidat(a,b,c,borders,L,rank,size,&sum,&resultnorm,message_type); // тут происходит весь подсчет
+	timediff=(*times);
+	normdiff=resultnorm;
+	
 	printResult(rank,borders,times,sum,resultnorm,"Simple break");
 	
 
 	//Часть с неравномерным разбиением
 	if(rank!=0){
-		a=(double*)realloc(a,sizeof(double)*10*L);//Перевыделяем память для a
-		for(int i=0;i<10*L;++i) a[i]=fRand();
-		c=(double*)realloc(c,sizeof(double)*10*L);//Перевыделяем память для с
+		if(N>100){
+			a=(double*)realloc(a,sizeof(double)*100*L);//Перевыделяем память для a
+			c=(double*)realloc(c,sizeof(double)*100*L);//Перевыделяем память для с
+			if(a==NULL || c==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
+			for(int i=0;i<100*L;++i) a[i]=fRand();
+		}
+		else{
+			a=(double*)realloc(a,sizeof(double)*N*L);//Перевыделяем память для a
+			c=(double*)realloc(c,sizeof(double)*N*L);//Перевыделяем память для с
+			if(a==NULL || c==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
+			for(int i=0;i<N*L;++i) a[i]=fRand();
+		}
 	}
 	else{
 		times=(double*)realloc(times,sizeof(double)*size);//на root перевыделяем память под времена
+		if(times==NULL) MPI_Abort(MPI_COMM_WORLD,1);//возможно была ошибка у realloc
 	}
 	
 	//Определяем производительность
 	(*times)=-MPI_Wtime();
-	Mprod(a,b,c,10,L,L);
+	if(N>100)	Mprod(a,b,c,100,L,L);
+	else        Mprod(a,b,c,N,L,L);
 	(*times) += MPI_Wtime();
 	//Собираем времена на 0 процессе
 	MPI_Gather(times,1,MPI_DOUBLE,times,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
@@ -83,9 +98,14 @@ int main(int argc, char** argv){
 	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
 	
 	(*times)=Core_Candidat(a,b,c,borders,L,rank,size,&sum,&resultnorm,message_type); // тут происходит весь подсчет
-
+	timediff-=(*times);
+	normdiff-=resultnorm;
+	
 	printResult(rank,borders,times,sum,resultnorm,"Addaptive break");
 	
+	
+	MPI_Barrier(MPI_COMM_WORLD);
+	if(rank==0)	fprintf(stderr,"++++++++++++++++++++++++++++++\nTimediff: %lf\nNormdiff: %.10lf\n",timediff,normdiff);
 	MPI_Finalize();
 	
 	return 0;
