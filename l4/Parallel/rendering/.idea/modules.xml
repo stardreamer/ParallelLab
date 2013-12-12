@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$USER_HOME$/Downloads/pysmart/.idea/pysmart.iml" filepath="$USER_HOME$/Downloads/pysmart/.idea/pysmart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/rendering.iml" filepath="$PROJECT_DIR$/.idea/rendering.iml" />
+      <module fileurl="file://$USER_HOME$/PycharmProjects/testPytables/.idea/testPytables.iml" filepath="$USER_HOME$/PycharmProjects/testPytables/.idea/testPytables.iml" />
+    </modules>
+  </component>
+</project>
+
