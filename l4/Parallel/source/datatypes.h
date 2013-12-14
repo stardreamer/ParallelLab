@@ -1,7 +1,7 @@
 #ifndef DATA_TYPE_H
 #define DATA_TYPE_H
-#define ARRAY_INIT {{0, 0, 0}, NULL}
-#define NINJA_INIT {0, 0, NULL}
+#define ARRAY_INIT {0, NULL}
+#define NINJA_INIT {0, 0}
 #define RANDOM_MODE 3
 #define fMin -1000.//нижняя граница чисел
 #define fMax 1000.//верхняя граница чисел
@@ -19,14 +19,13 @@ struct Border{ //левая правая граница длина
 };
 
 struct Array{ //размер + указатель на массив
-	border myBorder;
+	long long int length;
 	double* Arr;
 };
 
 
 struct Ninja{ //В структуре хранится индекс первого элемента массива больше ведущего и указатель на него
 	long long int ninjaIdx,ninjaBlade;
-	double *ninjaPointer;
 };
 
 inline double fRand() __attribute__((always_inline));

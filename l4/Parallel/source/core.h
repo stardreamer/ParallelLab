@@ -6,6 +6,7 @@
 #include "datatypes.h"
 #include <stdio.h>
 #include <mpi.h>
+#include <string.h>
 
 
 
@@ -17,7 +18,7 @@ inline double getAvg(array* myArray, MPI_Comm currentComm) __attribute__((always
 
 
 double core(array* myArray, int mode);
-void MyMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_Comm currentComm);
+void MySwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_Comm currentComm);
 
 inline int isPowerOfTwo (unsigned int x){
 	return ((x != 0) && ((x & (~x + 1)) == x));
@@ -26,7 +27,7 @@ inline int isPowerOfTwo (unsigned int x){
 inline double getSum(array* myArray){
 	double sum=0.;
 	double *tempPointer=(*myArray).Arr;
-	for(long long int i=0;i<(*myArray).myBorder.length;++i,tempPointer++)
+	for(long long int i=0;i<(*myArray).length;++i,tempPointer++)
 		sum+=*tempPointer;
 	return sum;	
 }
@@ -39,7 +40,7 @@ inline double getAvg(array* myArray, MPI_Comm currentComm){
 	avg=getSum(myArray);
 	
 	//Собраем число элементов в каждой группе и групповую сумму
-	MPI_Allreduce(&(*myArray).myBorder.length, &Len, 1, MPI_LONG_LONG_INT, MPI_SUM, currentComm);
+	MPI_Allreduce(&(*myArray).length, &Len, 1, MPI_LONG_LONG_INT, MPI_SUM, currentComm);
 	MPI_Allreduce(&avg,&avg, 1, MPI_DOUBLE, MPI_SUM, currentComm);
 	
 	//Среднее арифметическое

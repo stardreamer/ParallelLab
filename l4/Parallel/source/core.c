@@ -23,17 +23,20 @@ double core(array* myArray, int mode){
 	myNinja=getNinja(myArray,lider);
 	
 	fprintf(stderr,"~^ %lf %i\n", lider, rank);
-	for(long long int i=0;i<(*myArray).myBorder.length;++i)
+	for(long long int i=0;i<(*myArray).length;++i)
 		fprintf(stderr,"~e %lf %i\n", (*myArray).Arr[i], rank);
 	
-	
+	fprintf(stderr,"~i %i %i(Len %lld)\n", myNinja.ninjaIdx, rank, (*myArray).length);
+	MPI_Barrier(currentComm);
 
-	
-	
-	
-	
+	MySwapAndMerge(myArray, &myNinja, rank, ProcNum, currentComm);
+	MPI_Barrier(currentComm);
+	fprintf(stderr,"MYRGE\n");
+	for(long long int i=0;i<(*myArray).length;++i)
+		fprintf(stderr,"~e %lf %i\n", (*myArray).Arr[i], rank);
+	MPI_Barrier(currentComm);
 	//fprintf(stderr,"~o(iLen %lld)-(oLen %lld) %i\n",inlen,outlen, rank);
-	fprintf(stderr,"~i %i %i(Len %lld)\n", myNinja.ninjaIdx, rank, (*myArray).myBorder.length);
+	fprintf(stderr,"~i %i %i(Len %lld)\n", myNinja.ninjaIdx, rank, (*myArray).length);
 	color=(rank<ProcNum/2)?0:1;
 	MPI_Comm_split(currentComm,color,rank,&currentComm);
 	

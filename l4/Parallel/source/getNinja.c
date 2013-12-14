@@ -5,9 +5,8 @@ ninja getNinja(array* wholeArray, double lider){
 	
 	//получаем индекс первого элемента большего чем ведущий
 	tempNinja.ninjaIdx=getNinjaIdx(wholeArray,lider);
-	//получаем указатель на этот элемент
-	tempNinja.ninjaPointer=&(*wholeArray).Arr[tempNinja.ninjaIdx];
-	tempNinja.ninjaBlade=(*wholeArray).myBorder.length-tempNinja.ninjaIdx;
+	//получаем длину хвоста
+	tempNinja.ninjaBlade=(*wholeArray).length-tempNinja.ninjaIdx;
 	
 	return tempNinja;
 }

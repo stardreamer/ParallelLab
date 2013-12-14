@@ -9,7 +9,7 @@
  */
 
 void MyBubbleSort(array* unsortedArray){
-	long long int size = (*unsortedArray).myBorder.length;
+	long long int size = (*unsortedArray).length;
 	double *arr=(*unsortedArray).Arr;
 	double buf=0.;
 	
