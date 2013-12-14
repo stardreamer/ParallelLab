@@ -1,7 +1,9 @@
 #include "core.h"
 
+int myerror=0;
 
 int main(int argc, char *argv[]){
+
 	long long int len=argc>1?atoll(argv[1]):100; //Длина последовательность
 	int seed=argc>2?atoll(argv[2]):-1; //Семя для генератора случайных чисел
 	array myArray=ARRAY_INIT; //Массив с данными
@@ -30,7 +32,7 @@ int main(int argc, char *argv[]){
 	
 	double t=core(&myArray, MY_MPI_QSORT);
 	
-	fprintf(stderr,"\nTime %lf\n",t);
+	fprintf(stderr,"\nResult: %s Time: %lf\n Rank: %i\n",errorString(myerror),t, rank);
 	
 	arrayFree(&myArray);
 	MPI_Finalize();

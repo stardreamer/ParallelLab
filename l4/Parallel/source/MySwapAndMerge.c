@@ -28,7 +28,7 @@ void MySwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_C
 	
 
 	
-	fprintf(stderr,"~o(iLen %lld)-(oLen %lld) %i\n",inlen,outlen, rank);
+	//fprintf(stderr,"~o(iLen %lld)-(oLen %lld) %i\n",inlen,outlen, rank);
 
 	//Обмениваемся элементами
 	MyMpiSwap(myArray, myNinja->ninjaIdx, inlen, outlen, rank, ProcNum, currentComm);

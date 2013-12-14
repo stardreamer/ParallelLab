@@ -16,13 +16,8 @@
 void MyMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int rank,int ProcNum, MPI_Comm currentComm){
 	array bufArray=ARRAY_INIT; //Здесь будет храниться указатель на часть полученную с другого процесса. 
 
-	/*
-	 *Если процессу нужно передавать данные, то смотрим на его номер. 
-	 *Если номер в первой половине, то отдаем элементы большие ведущего
-	 *Если номер во второй половине, то отдаем элементы меньшие ведущего
-	 * */
-	if(inlen!=0){
-			
+	
+	if(inlen!=0){ //Все процессы, которым нужно принимать данные - выделяют память. Важно - проверка на NULL. Временами массивы становятся пустым			
 			bufArray.length=inlen; //находим длину нового хвоста
 			if(myArray->Arr!=NULL)
 				myArray->Arr=(double *)realloc(myArray->Arr,(bufArray.length+myArray->length)*sizeof(double));
@@ -32,39 +27,36 @@ void MyMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int 
 			bufArray.Arr=&(myArray->Arr[myArray->length]); // получем указатель на хвост. Выхода за пределы массива не происходит ибо память довыделена
 	}	
 	
+	/*
+	 *Если процессу нужно передавать данные, то смотрим на его номер. 
+	 *Если номер в первой половине, то отдаем элементы большие ведущего
+	 *Если номер во второй половине, то отдаем элементы меньшие ведущего
+	 *Если процессу нужно принимать данные, то смотрим на его номер
+	 *Если номер в первой половине, то принимаем с обрубка хвоста массива
+	 *Если номер во второй половине, то нужны дополнительные телодвижения
+	 * 
+	 * */
+	if(rank<(ProcNum/2)){
+		if(outlen!=0)
+			MPI_Send(&(myArray->Arr[ninjaIdx]), outlen,MPI_DOUBLE,rank+(ProcNum/2),0,currentComm);
+	}
+	else{	
+		if(inlen!=0)
+			MPI_Recv(bufArray.Arr,inlen,MPI_DOUBLE,rank-(ProcNum/2),0,currentComm,MPI_STATUS_IGNORE);	
+	}
 	
-		if(rank<(ProcNum/2)){
-			if(outlen!=0){
-				fprintf(stderr,"send from %i to %i\n",rank,rank+(ProcNum/2));
-				MPI_Send(&(myArray->Arr[ninjaIdx]), outlen,MPI_DOUBLE,rank+(ProcNum/2),0,currentComm);
-			}
-		}
-		else{	
-			if(inlen!=0){	
-			fprintf(stderr," recv  from %i to %i\n",rank-(ProcNum/2),rank);
-				MPI_Recv(bufArray.Arr,inlen,MPI_DOUBLE,rank-(ProcNum/2),0,currentComm,MPI_STATUS_IGNORE);
-					fprintf(stderr," recved %i\n",rank);
-			}
-			
-		}
-		
-		if(rank>=(ProcNum/2)){
-			if(outlen!=0){
-				fprintf(stderr," send  from %i to %i\n",rank,rank-(ProcNum/2));
-				MPI_Send(myArray->Arr, outlen, MPI_DOUBLE, rank-(ProcNum/2), 0, currentComm);
-			}
-		}
-		else{
-			if(inlen!=0){	
-				MPI_Recv(bufArray.Arr,inlen,MPI_DOUBLE,rank+(ProcNum/2),0,currentComm,MPI_STATUS_IGNORE);
-				fprintf(stderr," recved %i\n",rank);
-			}
-		}
+	if(rank>=(ProcNum/2)){
+		if(outlen!=0)
+			MPI_Send(myArray->Arr, outlen, MPI_DOUBLE, rank-(ProcNum/2), 0, currentComm);	
+	}
+	else{
+		if(inlen!=0)
+			MPI_Recv(bufArray.Arr,inlen,MPI_DOUBLE,rank+(ProcNum/2),0,currentComm,MPI_STATUS_IGNORE);
+	}
 	
 	
 	
-	if(outlen!=0){
-		
+	if(outlen!=0){	
 		if(inlen==0){ // если не принимаем данные то надо осторожно поработать с памятью
 			myArray->length=(myArray->length-outlen); // для начала вычислим длину массива
 			
@@ -83,14 +75,8 @@ void MyMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int 
 		}
 	}
 
-	/*
-	 * Если процессу нужно принимать данные, то смотрим на его номер
-	 * Если номер в первой половине, то принимаем с обрубка хвоста массива
-	 * Если номер во второй половине, то нужны дополнительные телодвижения
-	 * 
-	 * */
-	if(inlen!=0){
-		
+
+	if(inlen!=0){		
 		if(rank<(ProcNum/2)) // Хитрая часть. Если процесс в первой половине, то просто вживляем хвост на место старого
 			memcpy(&(myArray->Arr[ninjaIdx]), bufArray.Arr, sizeof(double)*bufArray.length);
 		else{ // иначе приходится снача перенести в начало массива оставшиеся элементы

@@ -1,9 +1,16 @@
  #include "datatypes.h"
 
+/*
+ * 
+ * name: MyNormalizator
+ * @param firstArray указатель на массив
+ * @return
+ * 
+ */
 long long int MyNormalizator(array* firstArray){
-	long long int sentinel=0;
+	long long int sentinel=0; //индекс первого неотсортированного элемента
 	double buf=0.;
-	long long int counter=0;
+	long long int counter=0; //число переcтановок
 
 	if(firstArray->Arr!=NULL){
 	for(;sentinel<(firstArray->length-1) && 

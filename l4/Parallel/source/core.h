@@ -4,9 +4,11 @@
 #define MY_MPI_EVEN_N_EVEN 2
 
 #include "datatypes.h"
+#include "myerrors.h"
 #include <stdio.h>
 #include <mpi.h>
 #include <string.h>
+
 
 
 

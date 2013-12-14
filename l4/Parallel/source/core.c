@@ -1,5 +1,14 @@
 #include "core.h"
 
+/*
+ * 
+ * name: core
+ * @param myArray указатель на массив
+ * @param mode режим работы
+ * @return t время работы
+ * 
+ */
+
 double core(array* myArray, int mode){
 	double t=0.;//Время
 	
@@ -34,8 +43,11 @@ double core(array* myArray, int mode){
 	t=MPI_Wtime()-t;
 	
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-	for(long long int i=0;i<(*myArray).length;++i)
-		fprintf(stderr,"~e %lf %i\n", (*myArray).Arr[i], rank);
+
+	if(isSorted(myArray))
+		myerror=SORT_SUCCESSED;
+	else
+		myerror=SORT_UNSUCCESSED;
 	
 
 
