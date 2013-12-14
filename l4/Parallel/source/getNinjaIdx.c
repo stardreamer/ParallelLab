@@ -11,8 +11,10 @@
 long long int getNinjaIdx(array* wholeArray, double lider){
 	double *temp=(*wholeArray).Arr;
 	long long int i=0;
-
-	for(i=0;(*temp<lider)&&(i<((*wholeArray).length));temp++, ++i);
+	
+	if(temp!=NULL)
+		for(;(*temp<lider)&&(i<((*wholeArray).length));temp++, i++);
+	
 	
 	return i;
 }

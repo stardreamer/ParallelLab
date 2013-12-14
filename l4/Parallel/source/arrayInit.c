@@ -16,5 +16,5 @@ void arrayInit(array* emptyArray,int rank,long long int len,int ProcNum,int *sou
 	border slice=getNum(rank,len,ProcNum);
 	//Вычисление числа элементов и получение последовательности
 	(*emptyArray).length=slice.length;
-	(*emptyArray).Arr=getData(slice,source,mode);	
+	(*emptyArray).Arr=getData(&slice,source,mode);	
 }

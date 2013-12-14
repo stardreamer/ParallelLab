@@ -3,9 +3,10 @@
 
 int main(int argc, char *argv[]){
 	long long int len=argc>1?atoll(argv[1]):100; //Длина последовательность
+	int seed=argc>2?atoll(argv[2]):-1; //Семя для генератора случайных чисел
 	array myArray=ARRAY_INIT; //Массив с данными
 	int ProcNum=0,rank=0;
-	int seed=-1;
+
 
 	MPI_Init(&argc,&argv); //Необходимо для вызова MPI функций
 	
@@ -21,7 +22,10 @@ int main(int argc, char *argv[]){
 	}
 	
 	//Инициализация массива
-	arrayInit(&myArray,rank,len,ProcNum,&seed,RANDOM_MODE);
+	if(seed!=-1)
+		arrayInit(&myArray,rank,len,ProcNum,&seed,DEFINED_RANDOM_MODE);
+	else
+		arrayInit(&myArray,rank,len,ProcNum,&seed,RANDOM_MODE);
 	
 	
 	double t=core(&myArray, MY_MPI_QSORT);

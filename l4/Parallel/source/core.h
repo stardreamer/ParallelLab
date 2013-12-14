@@ -19,6 +19,8 @@ inline double getAvg(array* myArray, MPI_Comm currentComm) __attribute__((always
 
 double core(array* myArray, int mode);
 void MySwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_Comm currentComm);
+void MyMpiSwap(array* myArray, long long int ninjaIdx, int inlen, int outlen, int rank,int ProcNum, MPI_Comm currentComm);
+
 
 inline int isPowerOfTwo (unsigned int x){
 	return ((x != 0) && ((x & (~x + 1)) == x));
