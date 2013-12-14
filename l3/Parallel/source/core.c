@@ -125,7 +125,7 @@ double core(double T,double L,int I,int NFRAMES){
 			}
 		
 	
-	for(double tau=0;tau<T;tau+=dt){
+	for(double tau=0.;tau<T;tau+=dt){
 		
 		//Задание граничных условий
 		if(rank==0 ){

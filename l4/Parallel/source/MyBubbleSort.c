@@ -1,5 +1,13 @@
 #include "core.h"
 
+/*
+ * 
+ * name: MyBubbleSort
+ * @param unsortedArray указатель на неотсортированный массив
+ * @return void
+ * 
+ */
+
 void MyBubbleSort(array* unsortedArray){
 	long long int size = (*unsortedArray).myBorder.length;
 	double *arr=(*unsortedArray).Arr;

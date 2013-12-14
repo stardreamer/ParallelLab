@@ -1,4 +1,4 @@
-#include "core.h"
+#include "datatypes.h"
 
 border getNum(int rank,long long int N,int size){
 	long long  int h,m;
