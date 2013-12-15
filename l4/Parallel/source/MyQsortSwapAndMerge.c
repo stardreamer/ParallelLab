@@ -11,7 +11,7 @@
  * @return void
  * 
  */
-void MySwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_Comm currentComm){
+void MyQsortSwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_Comm currentComm){
 	long long int outlen=0,inlen=0; // число принимаемых и отправляемых элементов
 	
 	
@@ -31,10 +31,8 @@ void MySwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_C
 	//fprintf(stderr,"~o(iLen %lld)-(oLen %lld) %i\n",inlen,outlen, rank);
 
 	//Обмениваемся элементами
-	MyMpiSwap(myArray, myNinja->ninjaIdx, inlen, outlen, rank, ProcNum, currentComm);
+	MyQsortMpiSwap(myArray, myNinja->ninjaIdx, inlen, outlen, rank, ProcNum, currentComm);
 	//Нормализуем массив
 	MyNormalizator(myArray);
-	
-	
-	
+		
 }

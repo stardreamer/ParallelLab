@@ -26,10 +26,18 @@ int main(int argc, char *argv[]){
 	
 	
 	double t=core(&myArray, MY_MPI_QSORT);
-	
-	fprintf(stderr,"\nResult: %s\n Time: %lf\n Rank: %i\n",errorString(myerror),t, rank);
-	
+	fprintf(stderr,"\nQSORT Result: %s\n Time: %lf\n Rank: %i\n",errorString(myerror),t, rank);
 	arrayFree(&myArray);
+	
+	if(seed!=-1)
+		arrayInit(&myArray,rank,len,ProcNum,&seed,DEFINED_RANDOM_MODE);
+	else
+		arrayInit(&myArray,rank,len,ProcNum,&seed,RANDOM_MODE);
+
+	t=core(&myArray, MY_MPI_EVEN_N_EVEN);
+	fprintf(stderr,"\nEVEN Result: %s\n Time: %lf\n Rank: %i\n",errorString(myerror),t, rank);
+	arrayFree(&myArray);
+	
 	MPI_Finalize();
 	return 0;
 }

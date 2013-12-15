@@ -1,5 +1,15 @@
 #include "datatypes.h"
 
+/*
+ * 
+ * name: getNum
+ * @param rank номер процесса
+ * @param N число элементов
+ * @param size число процессов
+ * @return temp границы
+ * 
+ */
+
 border getNum(int rank,long long int N,int size){
 	long long  int h,m;
 	border temp;

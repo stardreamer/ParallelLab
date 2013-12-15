@@ -14,9 +14,20 @@ double core(array* myArray, int mode){
 	
 	//Начинаем замер времени
 	t=MPI_Wtime();
-	
-	myerror=MyMpiQsort(myArray);
+	//Смотрим режим работы
+	switch(mode){
+		case MY_MPI_QSORT:
+			myerror=MyMpiQsort(myArray);
+		break;
 		
+		case MY_MPI_EVEN_N_EVEN:
+			myerror=MyMpiEVESort(myArray);
+		break;
+		
+		default:
+			myerror=UNKNOWN_MODE;
+		break;
+	}
 	t=MPI_Wtime()-t;
 	
 	return t;

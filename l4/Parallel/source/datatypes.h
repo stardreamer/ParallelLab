@@ -4,8 +4,8 @@
 #define NINJA_INIT {0, 0}
 #define RANDOM_MODE 3
 #define DEFINED_RANDOM_MODE 4
-#define fMin -1000.//нижняя граница чисел
-#define fMax 1000.//верхняя граница чисел
+#define fMin -1000. //нижняя граница чисел
+#define fMax 1000. //верхняя граница чисел
 #define TRUE (42==42)
 #define FALSE (!TRUE)
 
@@ -28,19 +28,19 @@ struct Array{ //размер + указатель на массив
 
 
 struct Ninja{ //В структуре хранится индекс первого элемента массива больше ведущего и указатель на него
-	long long int ninjaIdx,ninjaBlade;
+	long long int ninjaIdx, ninjaBlade;
 };
 
 inline double fRand() __attribute__((always_inline));
 inline int isSorted(array* misticArray) __attribute__((always_inline));
 inline double getSum(array* myArray) __attribute__((always_inline));
 
-border getNum(int rank,long long int N,int size);
-double* getData(border* slice,void *source, int mode);
-long long int MyBubbleSort(array* unsortedArray);
-long long int MyNormalizator(array* firstArray);
-void arrayInit(array* emptyArray,int rank,long long int N,int size, int *seed, int mode);
-void arrayFree(array* emptyArray);
+border getNum(int rank,long long int N,int size); //получение границ
+double* getData(border* slice,void *source, int mode); //получение данных
+long long int MyBubbleSort(array* unsortedArray); //пузырьковая сортировка
+long long int MyNormalizator(array* firstArray); //упорядочиватель 
+void arrayInit(array* emptyArray,int rank,long long int N,int size, int *seed, int mode); //инициаллизация массива
+void arrayFree(array* emptyArray); //освобождение памяти
 
 
 long long int   getNinjaIdx(array* wholeArray, double lider);

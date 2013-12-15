@@ -13,7 +13,7 @@
  * @return void
  * 
  */
-void MyMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int rank,int ProcNum, MPI_Comm currentComm){
+void MyQsortMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int rank,int ProcNum, MPI_Comm currentComm){
 	array bufArray=ARRAY_INIT; //Здесь будет храниться указатель на часть полученную с другого процесса. 
 
 	
@@ -67,7 +67,7 @@ void MyMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int 
 				if(rank<(ProcNum/2)) // для первой половины достаточно просто отрезать хвост
 					myArray->Arr=(double *)realloc(myArray->Arr,myArray->length*sizeof(double));
 				else{ // для второй половины надо сначала перенести оставшиеся элементы в начало массива
-					memcpy(myArray->Arr, &(myArray->Arr[ninjaIdx]), sizeof(double)*(myArray->length));
+					memmove(myArray->Arr, &(myArray->Arr[ninjaIdx]), sizeof(double)*(myArray->length));
 					myArray->Arr=(double *)realloc(myArray->Arr,myArray->length*sizeof(double));
 				}
 			}
@@ -76,11 +76,11 @@ void MyMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int 
 
 
 	if(inlen!=0){		
-		if(rank<(ProcNum/2)) // Хитрая часть. Если процесс в первой половине, то просто вживляем хвост на место старого
-			memcpy(&(myArray->Arr[ninjaIdx]), bufArray.Arr, sizeof(double)*bufArray.length);
-		else{ // иначе приходится снача перенести в начало массива оставшиеся элементы
-			memcpy(myArray->Arr, &(myArray->Arr[ninjaIdx]), sizeof(double)*(myArray->length-outlen));
-			memcpy(&(myArray->Arr[myArray->length-outlen]), bufArray.Arr, sizeof(double)*bufArray.length);
+		if(rank<(ProcNum/2)) //Хитрая часть. Если процесс в первой половине, то просто вживляем хвост на место старого
+			memmove(&(myArray->Arr[ninjaIdx]), bufArray.Arr, sizeof(double)*bufArray.length);
+		else{ //иначе приходится сначала перенести в начало массива оставшиеся элементы
+			memmove(myArray->Arr, &(myArray->Arr[ninjaIdx]), sizeof(double)*(myArray->length-outlen));
+			memmove(&(myArray->Arr[myArray->length-outlen]), bufArray.Arr, sizeof(double)*bufArray.length);
 		}
 		myArray->length=(inlen+myArray->length-outlen);
 		myArray->Arr=(double *)realloc(myArray->Arr,myArray->length*sizeof(double)); //хвост опять обрубаем

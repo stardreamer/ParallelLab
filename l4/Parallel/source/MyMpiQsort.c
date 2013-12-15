@@ -10,17 +10,13 @@ int MyMpiQsort(array* myArray){
 	
 	if(!isPowerOfTwo(ProcNum))
 		return WRONG_PROC_NUMBER;
-
 	
 	//Сортировка(пузырек)
 	MyBubbleSort(myArray);
 	
 	//Сортировка(MPI_QSORT)
 	while(ProcNum!=1){
-	
-		MPI_Comm_rank(currentComm,&rank);
-		fprintf(stderr,"~Pn %i \n", ProcNum);
-		
+		MPI_Comm_rank(currentComm,&rank);		
 		
 		//Ведущий элемент
 		lider=getAvg(myArray, currentComm);
@@ -29,7 +25,7 @@ int MyMpiQsort(array* myArray){
 		myNinja=getNinja(myArray,lider);
 		
 		//Обмениваемся данными и сливаем массивы
-		MySwapAndMerge(myArray, &myNinja, rank, ProcNum, currentComm);
+		MyQsortSwapAndMerge(myArray, &myNinja, rank, ProcNum, currentComm);
 		
 		//Помечаем процессы для разбиения на группы
 		color=(rank<ProcNum/2)?0:1;
