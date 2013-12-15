@@ -14,10 +14,11 @@ inline void printReport(report* myReport){
 
 inline void printGlobalReport(report* myReport, int len){
 	double minTime, maxTime;
-	
-	MPI_Reduce(&(myReport->time), &minTime, 1,MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&(myReport->time), &maxTime, 1,MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-	if(myReport->rank==0)
+	int ProcNum;
+	MPI_Comm_size(MPI_COMM_WORLD,&ProcNum);
+	MPI_Reduce(&(myReport->time), &minTime, 1,MPI_DOUBLE, MPI_MIN, ProcNum-1, MPI_COMM_WORLD);
+	MPI_Reduce(&(myReport->time), &maxTime, 1,MPI_DOUBLE, MPI_MAX, ProcNum-1, MPI_COMM_WORLD);
+	if(myReport->rank==ProcNum-1)
 		fprintf(stderr,
 			"Task: %s\n Result: %s\n Rank: %i\n MinTime: %lf\n MaxTime: %lf \n Length: %i\n",
 			myReport->mode,
