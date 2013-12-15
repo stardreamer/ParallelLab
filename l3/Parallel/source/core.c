@@ -70,7 +70,7 @@ double core(double T,double L,int I,int NFRAMES){
 	
 	Build_derived_type_data(PrePoints,&data_type);
 	
-	
+	if(NFRAMES!=0)
 	dfr = (int)(T/dt)/NFRAMES;
 	
 	if(rank==0){
@@ -125,7 +125,7 @@ double core(double T,double L,int I,int NFRAMES){
 			}
 		
 	
-	for(double tau=0;tau<T;tau+=dt){
+	for(double tau=0.;tau<T;tau+=dt){
 		
 		//Задание граничных условий
 		if(rank==0 ){
@@ -180,12 +180,13 @@ double core(double T,double L,int I,int NFRAMES){
 				MPI_Recv(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
 			}
 		
+		if(NFRAMES!=0){
 		//Вывод в файл
 		if(rank==0)
 			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(0,0,sizeC)],sizeL*sizeC,dfr);
 		else
 			cinematicPrintPoint(file,Tstep,tau,&PrePoints[reductor(1,0,sizeC)],sizeL*sizeC,dfr);
-		
+		}
 		
 		//Разностная схема
 		if(rank == 0 || rank == ProcNum-1)
