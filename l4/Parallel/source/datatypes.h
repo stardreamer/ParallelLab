@@ -33,6 +33,7 @@ struct Ninja{ //В структуре хранится индекс первог
 
 inline double fRand() __attribute__((always_inline));
 inline int isSorted(array* misticArray) __attribute__((always_inline));
+inline double getSum(array* myArray) __attribute__((always_inline));
 
 border getNum(int rank,long long int N,int size);
 double* getData(border* slice,void *source, int mode);
@@ -56,5 +57,13 @@ inline int isSorted(array* misticArray){
 		if(misticArray->Arr[i]>misticArray->Arr[i+1])
 			break;
 	return i==misticArray->length-1;
+}
+
+inline double getSum(array* myArray){
+	double sum=0.;
+	double *tempPointer=myArray->Arr;
+	for(long long int i=0;i<myArray->length;++i,tempPointer++)
+		sum+=*tempPointer;
+	return sum;	
 }
 #endif

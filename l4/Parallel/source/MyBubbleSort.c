@@ -10,8 +10,8 @@
 
 long long int MyBubbleSort(array* unsortedArray){
 	long long int counter=0;
-	long long int size = (*unsortedArray).length;
-	double *arr=(*unsortedArray).Arr;
+	long long int size=unsortedArray->length;
+	double *arr=unsortedArray->Arr;
 	double buf=0.;
 	
 	for(long long int i=0;i<size;++i)

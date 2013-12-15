@@ -9,7 +9,7 @@
  */
 
 void arrayFree(array* fullArray){
-	(*fullArray).length=0;
+	fullArray->length=0;
 	free((*fullArray).Arr);
-	(*fullArray).Arr=NULL;
+	fullArray->Arr=NULL;
 }

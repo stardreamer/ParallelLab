@@ -1,0 +1,36 @@
+#include "core.h"
+
+/*
+ * 
+ * name: globalIsSorted
+ * @param myArray указатель на массив
+ * @param currentComm коммуникатор для которого проверяется сортировка
+ * @return результат сортировки
+ * 
+ */
+int globalIsSorted(array* myArray,MPI_Comm currentComm){
+	int ProcNum=0,rank=0;
+	double guest=0.; //элемент с которым происходит сравнение
+	
+	
+	MPI_Comm_size(currentComm, &ProcNum);
+	MPI_Comm_rank(currentComm, &rank);
+	
+	//Проверяем локальную отсортированность
+	if(!isSorted(myArray))
+		return LOCAL_SORT_UNSUCCESSED;
+	
+	//Отравляем последний элемент массива на последующий процесс
+	if(rank<ProcNum-1)
+		MPI_Send(&(myArray->Arr[myArray->length-1]), 1,MPI_DOUBLE,rank+1,0,currentComm);
+	
+	//Проверяем что этот элемент не превосходит первый элемент массива	
+	if(rank>0){
+		MPI_Recv(&guest,1,MPI_DOUBLE,rank-1,0,currentComm,MPI_STATUS_IGNORE);
+		if(guest>myArray->Arr[0])
+			return SORT_UNSUCCESSED;
+	}
+	
+	//Если прошли через все заграждения - свобода!
+	return SORT_SUCCESSED;
+}

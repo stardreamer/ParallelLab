@@ -16,12 +16,7 @@ int main(int argc, char *argv[]){
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 	
 	
-	if(!isPowerOfTwo(ProcNum)){
-		if(rank==0)
-			fprintf(stderr,"\n Wrong proc num\n");
-		MPI_Finalize();
-		return 1;
-	}
+
 	
 	//Инициализация массива
 	if(seed!=-1)
@@ -32,7 +27,7 @@ int main(int argc, char *argv[]){
 	
 	double t=core(&myArray, MY_MPI_QSORT);
 	
-	fprintf(stderr,"\nResult: %s Time: %lf\n Rank: %i\n",errorString(myerror),t, rank);
+	fprintf(stderr,"\nResult: %s\n Time: %lf\n Rank: %i\n",errorString(myerror),t, rank);
 	
 	arrayFree(&myArray);
 	MPI_Finalize();

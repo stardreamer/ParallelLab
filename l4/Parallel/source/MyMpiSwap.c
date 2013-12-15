@@ -61,8 +61,7 @@ void MyMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int 
 			myArray->length=(myArray->length-outlen); // для начала вычислим длину массива
 			
 			if(myArray->length==0){ // если передаем весь массив, то realloc не справится и надо освобождать память вручную
-				free(myArray->Arr);
-				myArray->Arr=NULL;
+				arrayFree(myArray);
 			}
 			else{ 
 				if(rank<(ProcNum/2)) // для первой половины достаточно просто отрезать хвост
