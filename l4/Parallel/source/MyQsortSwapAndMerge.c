@@ -12,18 +12,18 @@
  * 
  */
 void MyQsortSwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_Comm currentComm){
-	long long int outlen=0,inlen=0; // число принимаемых и отправляемых элементов
+	int outlen=0,inlen=0; // число принимаемых и отправляемых элементов
 	
 	
 	if(rank<(ProcNum/2)){ // отправляем хвост
 		outlen=myNinja->ninjaBlade;
-		MPI_Send(&outlen,1,MPI_LONG_LONG_INT,rank+(ProcNum/2),0,currentComm);
-		MPI_Recv(&inlen,1,MPI_LONG_LONG_INT,rank+(ProcNum/2),0,currentComm,MPI_STATUS_IGNORE);
+		MPI_Send(&outlen,1,MPI_INT,rank+(ProcNum/2),0,currentComm);
+		MPI_Recv(&inlen,1,MPI_INT,rank+(ProcNum/2),0,currentComm,MPI_STATUS_IGNORE);
 	}
 	else{ // отправляем голову 
 		outlen=myNinja->ninjaIdx;
-		MPI_Recv(&inlen,1,MPI_LONG_LONG_INT,rank-(ProcNum/2),0,currentComm,MPI_STATUS_IGNORE);
-		MPI_Send(&outlen,1,MPI_LONG_LONG_INT,rank-(ProcNum/2),0,currentComm);
+		MPI_Recv(&inlen,1,MPI_INT,rank-(ProcNum/2),0,currentComm,MPI_STATUS_IGNORE);
+		MPI_Send(&outlen,1,MPI_INT,rank-(ProcNum/2),0,currentComm);
 	}
 	
 

@@ -10,7 +10,7 @@
  * 
  */
 
-border getNum(int rank,long long int N,int size){
+border getNum(int rank,int N,int size){
 	long long  int h,m;
 	border temp;
 	h=N/(size);

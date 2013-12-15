@@ -13,7 +13,7 @@
  * @return void
  * 
  */
-void MyQsortMpiSwap(array* myArray, long long int ninjaIdx,int inlen,int outlen, int rank,int ProcNum, MPI_Comm currentComm){
+void MyQsortMpiSwap(array* myArray, int ninjaIdx,int inlen,int outlen, int rank,int ProcNum, MPI_Comm currentComm){
 	array bufArray=ARRAY_INIT; //Здесь будет храниться указатель на часть полученную с другого процесса. 
 
 	

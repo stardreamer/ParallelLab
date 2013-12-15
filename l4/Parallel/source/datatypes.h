@@ -16,34 +16,43 @@
 typedef struct Border border;
 typedef struct Array array;
 typedef struct Ninja ninja;
+typedef struct Report report;
 
 struct Border{ //левая правая граница длина
-	long long int left,right,length;
+	int left,right,length;
 };
 
 struct Array{ //размер + указатель на массив
-	long long int length;
+	int length;
 	double* Arr;
 };
 
 
 struct Ninja{ //В структуре хранится индекс первого элемента массива больше ведущего и указатель на него
-	long long int ninjaIdx, ninjaBlade;
+	int ninjaIdx, ninjaBlade;
+};
+
+struct Report{ //В структуре хранится отчет о работе
+	double time;
+	int errorCode;
+	int rank;
+	const char* mode;
 };
 
 inline double fRand() __attribute__((always_inline));
 inline int isSorted(array* misticArray) __attribute__((always_inline));
 inline double getSum(array* myArray) __attribute__((always_inline));
 
-border getNum(int rank,long long int N,int size); //получение границ
+
+border getNum(int rank,int N,int size); //получение границ
 double* getData(border* slice,void *source, int mode); //получение данных
-long long int MyBubbleSort(array* unsortedArray); //пузырьковая сортировка
-long long int MyNormalizator(array* firstArray); //упорядочиватель 
-void arrayInit(array* emptyArray,int rank,long long int N,int size, int *seed, int mode); //инициаллизация массива
+int MyBubbleSort(array* unsortedArray); //пузырьковая сортировка
+int MyNormalizator(array* firstArray); //упорядочиватель 
+void arrayInit(array* emptyArray,int rank,int N,int size, int *seed, int mode); //инициаллизация массива
 void arrayFree(array* emptyArray); //освобождение памяти
 
 
-long long int   getNinjaIdx(array* wholeArray, double lider);
+int   getNinjaIdx(array* wholeArray, double lider);
 ninja getNinja(array* wholeArray, double lider);
 
 inline double fRand(){
@@ -52,7 +61,7 @@ inline double fRand(){
 }
 
 inline int isSorted(array* misticArray){
-	long long int i=0;
+	int i=0;
 	for(; i<(misticArray->length-1);i++)
 		if(misticArray->Arr[i]>misticArray->Arr[i+1])
 			break;
@@ -62,8 +71,9 @@ inline int isSorted(array* misticArray){
 inline double getSum(array* myArray){
 	double sum=0.;
 	double *tempPointer=myArray->Arr;
-	for(long long int i=0;i<myArray->length;++i,tempPointer++)
+	for(int i=0;i<myArray->length;++i,tempPointer++)
 		sum+=*tempPointer;
 	return sum;	
 }
+
 #endif

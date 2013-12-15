@@ -2,11 +2,40 @@
 
 int myerror=0;
 
+inline void printReport(report* myReport){
+	fprintf(stderr,
+		"Task: %s\n Result: %s\n Rank: %i\n Time: %lf\n",
+		myReport->mode,
+		errorString(myReport->errorCode),
+		myReport->rank,
+		myReport->time
+		);
+}
+
+inline void printGlobalReport(report* myReport, int len){
+	double minTime, maxTime;
+	
+	MPI_Reduce(&(myReport->time), &minTime, 1,MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+	MPI_Reduce(&(myReport->time), &maxTime, 1,MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+	if(myReport->rank==0)
+		fprintf(stderr,
+			"Task: %s\n Result: %s\n Rank: %i\n MinTime: %lf\n MaxTime: %lf \n Length: %i\n",
+			myReport->mode,
+			errorString(myReport->errorCode),
+			myReport->rank,
+			minTime,
+			maxTime,
+			len
+			);
+
+}
+
 int main(int argc, char *argv[]){
 
-	long long int len=argc>1?atoll(argv[1]):100; //Длина последовательность
+	int len=argc>1?atoll(argv[1]):100; //Длина последовательность
 	int seed=argc>2?atoll(argv[2]):-1; //Семя для генератора случайных чисел
 	array myArray=ARRAY_INIT; //Массив с данными
+	report qReport,eReport; //Отчет
 	int ProcNum=0,rank=0;
 
 
@@ -25,8 +54,8 @@ int main(int argc, char *argv[]){
 		arrayInit(&myArray,rank,len,ProcNum,&seed,RANDOM_MODE);
 	
 	
-	double t=core(&myArray, MY_MPI_QSORT);
-	fprintf(stderr,"\nQSORT Result: %s\n Time: %lf\n Rank: %i\n",errorString(myerror),t, rank);
+	qReport=core(&myArray, MY_MPI_QSORT);
+	printReport(&qReport);
 	arrayFree(&myArray);
 	
 	if(seed!=-1)
@@ -34,10 +63,15 @@ int main(int argc, char *argv[]){
 	else
 		arrayInit(&myArray,rank,len,ProcNum,&seed,RANDOM_MODE);
 
-	t=core(&myArray, MY_MPI_EVEN_N_EVEN);
-	fprintf(stderr,"\nEVEN Result: %s\n Time: %lf\n Rank: %i\n",errorString(myerror),t, rank);
+	eReport=core(&myArray, MY_MPI_EVEN_N_EVEN);
+	printReport(&eReport);
 	arrayFree(&myArray);
 	
+	
+	MPI_Barrier(MPI_COMM_WORLD);
+	printGlobalReport(&qReport, len);
+	printGlobalReport(&eReport, len);
+
 	MPI_Finalize();
 	return 0;
 }

@@ -12,7 +12,7 @@
  * @return VOID
  * 
  */
-void arrayInit(array* emptyArray,int rank,long long int len,int ProcNum,int *source, int mode){
+void arrayInit(array* emptyArray,int rank,int len,int ProcNum,int *source, int mode){
 	//Рассчитаем границы
 	border slice=getNum(rank, len, ProcNum);
 	//Вычисление числа элементов и получение последовательности

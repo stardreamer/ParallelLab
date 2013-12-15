@@ -26,7 +26,7 @@ double* getData(border* slice,void *source, int mode){
 
 				srand(*((int *)source)); //инициализируем счетчик
 				
-				for(long long int i=0;i<slice->length;++i) //заполняем массив
+				for(int i=0;i<slice->length;++i) //заполняем массив
 					temp[i]=fRand();		
 					
 			break;
@@ -34,7 +34,7 @@ double* getData(border* slice,void *source, int mode){
 			case DEFINED_RANDOM_MODE:
 				srand(*((int *)source)+slice->left); //инициализируем счетчик
 				
-				for(long long int i=0;i<slice->length;++i) //заполняем массив
+				for(int i=0;i<slice->length;++i) //заполняем массив
 					temp[i]=fRand();
 			break;
 			

@@ -2,16 +2,16 @@
 
 void MyEveSwapAndMerge(array* myArray,int rank, MPI_Comm currentComm){
 
-		long long int inlen = 0;
+		int inlen = 0;
 
 		//Получаем размер отправляемого блока
 		if(rank==0){
-			MPI_Send(&(myArray->length),1,MPI_LONG_LONG_INT,1,0,currentComm);
-			MPI_Recv(&inlen,1,MPI_LONG_LONG_INT,1,0,currentComm,MPI_STATUS_IGNORE);
+			MPI_Send(&(myArray->length),1,MPI_INT,1,0,currentComm);
+			MPI_Recv(&inlen,1,MPI_INT,1,0,currentComm,MPI_STATUS_IGNORE);
 		}
 		else{
-			MPI_Recv(&inlen,1,MPI_LONG_LONG_INT,0,0,currentComm,MPI_STATUS_IGNORE);
-			MPI_Send(&(myArray->length),1,MPI_LONG_LONG_INT,0,0,currentComm);
+			MPI_Recv(&inlen,1,MPI_INT,0,0,currentComm,MPI_STATUS_IGNORE);
+			MPI_Send(&(myArray->length),1,MPI_INT,0,0,currentComm);
 		}
 
 		if(inlen!=0){ //Все процессы, которым нужно принимать данные - выделяют память. Важно - проверка на NULL. Временами массивы становятся пустым			
@@ -35,8 +35,9 @@ void MyEveSwapAndMerge(array* myArray,int rank, MPI_Comm currentComm){
 				MPI_Send(myArray->Arr,myArray->length,MPI_DOUBLE,0,0,currentComm);
 			}
 
-			MyBubbleSort(&tempArr);
+			MyNormalizator(&tempArr);
 			
+			//Меньший процесс оставляет левую полвину, старший правую 
 			if(rank==0){
 				tempArr.Arr=(double *)realloc(myArray->Arr,(tempArr.length/2)*sizeof(double));
 				myArray->length=tempArr.length/2;
