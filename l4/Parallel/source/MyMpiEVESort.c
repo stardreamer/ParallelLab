@@ -44,5 +44,5 @@ int MyMpiEVESort(array* myArray){
 
 	}
       
-	return globalIsSorted(myArray,MPI_COMM_WORLD);
+	return numofiter;
 }
