@@ -1,5 +1,17 @@
 #include "core.h"
 
+/**
+ * 
+ * бмен и слияние массивов между процессами
+ * при чет-нечетной сортировке
+ * @param myArray указатель на массив
+ * @param rank номер процессса
+ * @param currentComm коммуникатор
+ * @author Arthur Asylgareev (Virid Raven)
+ * @see #MyMpiEVESort()
+ * 
+ */
+
 void MyEveSwapAndMerge(array* myArray,int rank, MPI_Comm currentComm){
 
 		int inlen = 0;

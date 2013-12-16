@@ -1,12 +1,14 @@
 #include "datatypes.h"
 
-/*
+/**
  * 
- * name: getNum
+ * Получить границы разбиений
  * @param rank номер процесса
  * @param N число элементов
  * @param size число процессов
- * @return temp границы
+ * @author Arthur Asylgareev (Virid Raven)
+ * @return  границы разбиений
+ * @see #border
  * 
  */
 

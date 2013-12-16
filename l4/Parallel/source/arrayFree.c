@@ -1,10 +1,11 @@
 #include "datatypes.h"
 
-/*
+/**
  * 
- * name: arrayFree
+ * Освобождает память выделенную под массив
  * @param fullArray указатель на массив
- * @return void
+ * @author Arthur Asylgareev (Virid Raven)
+ * @see #array
  * 
  */
 
