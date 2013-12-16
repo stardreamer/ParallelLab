@@ -1,8 +1,9 @@
 #include "core.h"
 
-/*
+/**
  * 
- * name: MyMpiSwap
+ * Обмен элементами массивов между процессами 
+ * при "быстрой" сортировке
  * @param myArray указатель на массив
  * @param ninjaIdx индекс ведущего элемента
  * @param inlen количество принимаемых элементов
@@ -10,7 +11,8 @@
  * @param rank номер процесса
  * @param ProcNum общее число процессов
  * @param currentComm коммуникатор
- * @return void
+ * @author Arthur Asylgareev (Virid Raven)
+ * 
  * 
  */
 void MyQsortMpiSwap(array* myArray, int ninjaIdx,int inlen,int outlen, int rank,int ProcNum, MPI_Comm currentComm){

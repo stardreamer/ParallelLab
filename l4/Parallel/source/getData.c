@@ -1,12 +1,13 @@
 #include "datatypes.h"
 
 
-/*
+/**
+ * Возвращает массив с данными
  * 
- * name: getData
  * @param slice границы
  * @param source источник данных
  * @param mode режим работы
+ * @author Arthur Asylgareev (Virid Raven)
  * @return указатель на массив
  * 
  */

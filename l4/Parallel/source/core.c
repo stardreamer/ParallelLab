@@ -1,11 +1,13 @@
 #include "core.h"
 
-/*
+/**
  * 
- * name: core
+ * Вычислительное ядро. В зависимости от режима производит
+ * различные сортировки
  * @param myArray указатель на массив
  * @param mode режим работы
- * @return t время работы
+ * @author Arthur Asylgareev (Virid Raven)
+ * @return  время работы
  * 
  */
 

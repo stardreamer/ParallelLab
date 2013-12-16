@@ -8,9 +8,9 @@
 #define UNKNOWN_MODE -4
 #define UNABLE_TO_ALLOCATE_MEMORY -5
 
-extern int myerror; 
+extern int myerror; /**<код ошибки*/
 
-const char* errorString(int errorcode);
+const char* errorString(int errorcode); /**<строковое представление ошибки*/
 
 
 

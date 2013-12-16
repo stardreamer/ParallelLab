@@ -1,14 +1,16 @@
 #include "core.h"
 
-/*
+/**
  * 
- * name: MySwapAndMerge
+ * Обмен и слияние массивов между процессами 
+ * при "быстрой" сортировке
  * @param myArray указатель на массив
  * @param myNinja указатель на ниндзю
  * @param rank номер процесса
  * @param ProcNum общее число процессов
  * @param currentComm  коммуникатор
- * @return void
+ * @author Arthur Asylgareev (Virid Raven)
+ * @see #MyMpiQsort()
  * 
  */
 void MyQsortSwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, MPI_Comm currentComm){

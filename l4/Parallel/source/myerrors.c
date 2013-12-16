@@ -8,11 +8,11 @@
 #define UNABLE_TO_ALLOC_MEM_STR "Unable to allocate memory!"
 #define UNKNOWN_ERROR "Unknown error occured!"
 
-/*
+/**
  * 
- * name: errorString 
+ * Преобразует код ошибки в строковое представление
  * @param errorcode код ошибки
- * @return строковое представление ошибки
+ * @return  строковое представление ошибки
  * 
  */
 

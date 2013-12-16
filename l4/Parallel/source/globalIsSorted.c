@@ -1,16 +1,17 @@
 #include "core.h"
 
-/*
+/**
  * 
- * name: globalIsSorted
+ * Глобальная проверка на отсортированность массива разбросанного по процессам
  * @param myArray указатель на массив
- * @param currentComm коммуникатор для которого проверяется сортировка
+ * @param currentComm коммуникатор для которого проверяется упорядоченность
+ * @author Arthur Asylgareev (Virid Raven)
  * @return результат сортировки
  * 
  */
 int globalIsSorted(array* myArray,MPI_Comm currentComm){
-	int ProcNum=0,rank=0;
-	double guest=0.; //элемент с которым происходит сравнение
+	int ProcNum=0/*число процессов в группе*/,rank=0/*номер процесса*/;
+	double guest=0.; /*элемент с которым происходит сравнение*/
 	
 	
 	MPI_Comm_size(currentComm, &ProcNum);

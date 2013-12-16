@@ -1,5 +1,14 @@
 #include "core.h"
 
+/**
+ * Организует параллельную чет-неченую сортировку массива 
+ *
+ * @param myArray  указатель на массив
+ * @author Arthur Asylgareev (Virid Raven)
+ * @return  число шагов
+ * 
+ */
+
 int MyMpiEVESort(array* myArray){
 	int ProcNum=0,rank=0,color=0,numofiter=0;
 	ninja myNinja=NINJA_INIT;

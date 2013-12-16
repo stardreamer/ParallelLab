@@ -1,6 +1,13 @@
 #include "core.h"
 
-int myerror=0;
+int myerror=0; /**<код ошибки*/
+
+/**
+ * 
+ * Выводит на экран отчет по работе процесса
+ * @param myReport указатель на отчет
+ * @author Arthur Asylgareev (Virid Raven)
+ */
 
 inline void printReport(report* myReport){
 	fprintf(stderr,
@@ -14,6 +21,13 @@ inline void printReport(report* myReport){
 		);
 }
 
+/**
+ * 
+ * Выводит на экран глобальный отчет по работе процесса
+ * @param myReport указатель на отчет
+ * @param len длина последовательности элементов
+ * 
+ */
 inline void printGlobalReport(report* myReport, int len){
 	double minTime, maxTime;
 	int ProcNum;
@@ -37,12 +51,16 @@ inline void printGlobalReport(report* myReport, int len){
 
 }
 
+/**
+ * Точка входа 
+ * 
+ */
 int main(int argc, char *argv[]){
 
 	int care = (argc>1)&&(strcmp(argv[1],"full")==0)?1:0;
-	int len=argc>2?atoll(argv[2]):100; //Длина последовательность
-	int seed=argc>3?atoll(argv[3]):-1; //Семя для генератора случайных чисел
-	array myArray=ARRAY_INIT; //Массив с данными
+	int len=argc>2?atoll(argv[2]):100; /*Длина последовательности*/
+	int seed=argc>3?atoll(argv[3]):-1; /*Семя для генератора случайных чисел*/
+	array myArray=ARRAY_INIT; /*Массив с данными*/
 	report qReport,eReport; //Отчет
 	int ProcNum=0,rank=0;
 

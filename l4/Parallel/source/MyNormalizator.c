@@ -1,10 +1,12 @@
  #include "datatypes.h"
 
-/*
+/**
  * 
- * name: MyNormalizator
+ * Организует слияние массива, более эфективное 
+ * по временным затратам чем пузырьковая сортировка
  * @param firstArray указатель на массив
- * @return
+ * @author Arthur Asylgareev (Virid Raven)
+ * @return  число перестановок
  * 
  */
 int MyNormalizator(array* firstArray){

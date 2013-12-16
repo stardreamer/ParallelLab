@@ -1,10 +1,11 @@
 #include "datatypes.h"
 
-/*
+/**
  * 
- * name: MyBubbleSort
+ * Пузырьковая сортировка
  * @param unsortedArray указатель на неотсортированный массив
- * @return void
+ * @author Arthur Asylgareev (Virid Raven)
+ * @see #array
  * 
  */
 
