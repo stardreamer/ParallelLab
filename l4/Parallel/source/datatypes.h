@@ -36,6 +36,7 @@ struct Report{ //В структуре хранится отчет о работ
 	double time;
 	int errorCode;
 	int rank;
+	int steps,len;
 	const char* mode;
 };
 
