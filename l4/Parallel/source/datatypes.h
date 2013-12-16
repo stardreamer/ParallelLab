@@ -1,17 +1,20 @@
 #ifndef DATA_TYPE_H
 #define DATA_TYPE_H
+
+#include <time.h>
+#include <sys/time.h>
+#include <stdlib.h>
+#include "myerrors.h"
+
 #define ARRAY_INIT {0, NULL}
 #define NINJA_INIT {0, 0}
+#define REPORT_INIT {0, UNKNOWN_MODE,0,0,0,"Unknown mode"}
 #define RANDOM_MODE 3
 #define DEFINED_RANDOM_MODE 4
 #define fMin -1000. //нижняя граница чисел
 #define fMax 1000. //верхняя граница чисел
 #define TRUE (42==42)
 #define FALSE (!TRUE)
-
-#include <time.h>
-#include <sys/time.h>
-#include <stdlib.h>
 
 typedef struct Border border;
 typedef struct Array array;

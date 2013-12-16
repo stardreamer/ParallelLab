@@ -13,9 +13,9 @@ report core(array* myArray, int mode){
 	double t=0.;//Время
 	int rank=0;
 	myerror=1;
-	report localReport;
+	report localReport=REPORT_INIT;
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-	localReport.steps=0;
+	
 	//Начинаем замер времени
 	t=MPI_Wtime();
 	//Смотрим режим работы
@@ -31,8 +31,6 @@ report core(array* myArray, int mode){
 		break;
 		
 		default:
-			localReport.errorCode=UNKNOWN_MODE;
-			localReport.mode="Unknown mode";
 		break;
 	}
 	t=MPI_Wtime()-t;
