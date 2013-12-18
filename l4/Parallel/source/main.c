@@ -30,12 +30,20 @@ inline void printReport(report* myReport){
  */
 inline void printGlobalReport(report* myReport, int len){
 	double minTime, maxTime;
-	int ProcNum;
+	int ProcNum,minError=10,maxError=11;
 	int wholeLen=0;
 	MPI_Comm_size(MPI_COMM_WORLD,&ProcNum);
 	MPI_Reduce(&(myReport->len), &wholeLen, 1, MPI_INT, MPI_SUM, ProcNum-1, MPI_COMM_WORLD);
 	MPI_Reduce(&(myReport->time), &minTime, 1,MPI_DOUBLE, MPI_MIN, ProcNum-1, MPI_COMM_WORLD);
 	MPI_Reduce(&(myReport->time), &maxTime, 1,MPI_DOUBLE, MPI_MAX, ProcNum-1, MPI_COMM_WORLD);
+	MPI_Reduce(&(myReport->errorCode), &minError, 1,MPI_INT, MPI_MIN, ProcNum-1, MPI_COMM_WORLD);
+	MPI_Reduce(&(myReport->errorCode), &maxError, 1,MPI_INT, MPI_MAX, ProcNum-1, MPI_COMM_WORLD);
+	
+	if(minError==maxError && minError==SORT_SUCCESSED)
+		;
+	else
+		myReport->errorCode=SORT_UNSUCCESSED;
+	
 	if(myReport->rank==ProcNum-1)
 		fprintf(stderr,
 			"Task: %s\n Result: %s\n ProcNum: %i\n MinTime: %lf\n MaxTime: %lf \n Steps: %i\n Length: %i(%i)\n",

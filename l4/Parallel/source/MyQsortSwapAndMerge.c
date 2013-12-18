@@ -35,6 +35,7 @@ void MyQsortSwapAndMerge(array* myArray, ninja* myNinja, int rank, int ProcNum, 
 	//Обмениваемся элементами
 	MyQsortMpiSwap(myArray, myNinja->ninjaIdx, inlen, outlen, rank, ProcNum, currentComm);
 	//Нормализуем массив
-	MyNormalizator(myArray);
+
+	MyFastNormalizator(myArray);
 		
 }

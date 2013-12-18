@@ -11,7 +11,7 @@
 
 int MyMpiEVESort(array* myArray){
 	int ProcNum=0,rank=0,color=0,numofiter=0;
-	ninja myNinja=NINJA_INIT;
+	//ninja myNinja=NINJA_INIT;
 	MPI_Comm currentComm = MPI_COMM_WORLD;
 	MPI_Comm_rank(currentComm,&rank);		
 	MPI_Comm_size(currentComm,&ProcNum);
@@ -45,8 +45,8 @@ int MyMpiEVESort(array* myArray){
 		MPI_Comm_split(currentComm,color,rank,&currentComm);
 		MPI_Comm_rank(currentComm,&rank);		
 		MPI_Comm_size(currentComm,&ProcNum);
-		myNinja.ninjaIdx=myArray->length/2;
-		myNinja.ninjaBlade=myNinja.ninjaIdx;
+		/*myNinja.ninjaIdx=myArray->length/2;
+		myNinja.ninjaBlade=myNinja.ninjaIdx;*/
 		//Обмениваемся данными и сливаем массивы
 		if(ProcNum!=1)
 			MyEveSwapAndMerge(myArray, rank, currentComm);

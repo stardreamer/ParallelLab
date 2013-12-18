@@ -11,6 +11,6 @@
 
 void arrayFree(array* fullArray){
 	fullArray->length=0;
-	free((*fullArray).Arr);
+	free(fullArray->Arr);
 	fullArray->Arr=NULL;
 }

@@ -35,6 +35,7 @@ void MyEveSwapAndMerge(array* myArray,int rank, MPI_Comm currentComm){
 			else
 				myArray->Arr=(double *)malloc((inlen+myArray->length)*sizeof(double));
 			
+		
 			tempArr.length+=inlen;
 			tempArr.Arr=myArray->Arr;
 
@@ -46,7 +47,7 @@ void MyEveSwapAndMerge(array* myArray,int rank, MPI_Comm currentComm){
 				MPI_Recv(&(myArray->Arr[myArray->length]),inlen,MPI_DOUBLE,0,0,currentComm,MPI_STATUS_IGNORE);
 				MPI_Send(myArray->Arr,myArray->length,MPI_DOUBLE,0,0,currentComm);
 			}
-
+				
 			MyNormalizator(&tempArr);
 			
 			//Меньший процесс оставляет левую полвину, старший правую 
