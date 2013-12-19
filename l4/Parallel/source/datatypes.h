@@ -73,7 +73,7 @@ int MyBubbleSort(array* unsortedArray); //пузырьковая сортиро�
 int MyNormalizator(array* firstArray); //упорядочиватель 
 void arrayInit(array* emptyArray,int rank,int N,int size, int *seed, int mode); //инициаллизация массива
 void arrayFree(array* emptyArray); //освобождение памяти
-int MyFastNormalizator(array* preSorted);
+int MyFastNormalizator(array* preSorted,array* pastArray);
 
 int   getNinjaIdx(array* wholeArray, double lider);
 ninja getNinja(array* wholeArray, double lider);
