@@ -48,7 +48,7 @@ void MyEveSwapAndMerge(array* myArray,int rank, MPI_Comm currentComm){
 				MPI_Send(myArray->Arr,myArray->length,MPI_DOUBLE,0,0,currentComm);
 			}
 				
-			MyFastNormalizator(&tempArr,myArray);
+			MyNormalizator(&tempArr);
 			
 			//Меньший процесс оставляет левую полвину, старший правую 
 			if(rank==0){
