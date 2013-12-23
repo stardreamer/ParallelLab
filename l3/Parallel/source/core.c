@@ -18,7 +18,7 @@ double core(double T,double L,int I,int NFRAMES){
 
 	FILE *file;//Выходной файл
 	FILE *gnuplot;
-	double t;//Время
+	double t=0.;//Время
 	
 	point *CurPoints,*PrePoints,*bufPoints;//точка сетки
 	double dx=L/(double)(I-1),dy=L/(double)(I-1); //шаги
@@ -40,7 +40,10 @@ double core(double T,double L,int I,int NFRAMES){
 	
 	MPI_Comm_size(MPI_COMM_WORLD,&ProcNum);
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-	
+	if(ProcNum-1>sizeC) ProcNum=sizeC+1;
+		
+	if(rank<ProcNum){
+
 	if(rank==0){
 		borders=(border*)malloc(sizeof(border)*ProcNum);
 		getBorder(borders,sizeC,ProcNum);
@@ -58,7 +61,7 @@ double core(double T,double L,int I,int NFRAMES){
 	sizeL=(*borders).length;//число строк
 	cury=(double)(*borders).left*dy;//номер первой строки
 	
-	fprintf(stderr,"%i %lf\n",rank,cury);
+
 	if(rank!=0 && rank!=ProcNum-1){//на некрайних процессах на один буфер больше
 		CurPoints=calloc((sizeL+2)*sizeC,sizeof(point));
 		PrePoints=calloc((sizeL+2)*sizeC,sizeof(point));
@@ -232,5 +235,6 @@ double core(double T,double L,int I,int NFRAMES){
 	closeFile(&file);
 	free(CurPoints);
 	free(PrePoints);
+}
 	return t;
 } 
