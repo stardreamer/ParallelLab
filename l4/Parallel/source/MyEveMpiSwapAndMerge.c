@@ -50,20 +50,20 @@ void MyEveSwapAndMerge(array* myArray,int rank, MPI_Comm currentComm){
 				
 			//MyNormalizator(&tempArr);
 			MyFastNormalizator(&tempArr,myArray);
-			//Меньший процесс оставляет левую полвину, старший правую 
+			//Меньший процесс оставляет левую половину, старший правую 
 			if(rank==0){
-				tempArr.Arr=(double *)realloc(myArray->Arr,(tempArr.length/2)*sizeof(double));
+				tempArr.Arr=(double *)realloc(tempArr.Arr,(tempArr.length/2)*sizeof(double));
 				myArray->length=tempArr.length/2;
 			}
 			else{
 				if(tempArr.length%2==0){
-					memmove(myArray->Arr, &(tempArr.Arr[tempArr.length/2]), sizeof(double)*(tempArr.length/2));
-					tempArr.Arr=(double *)realloc(myArray->Arr,(tempArr.length/2)*sizeof(double));
+					memmove(tempArr.Arr, &(tempArr.Arr[tempArr.length/2]), sizeof(double)*(tempArr.length/2));
+					tempArr.Arr=(double *)realloc(tempArr.Arr,(tempArr.length/2)*sizeof(double));
 					myArray->length=tempArr.length/2;
 				}
 				else{
 					memmove(myArray->Arr, &(tempArr.Arr[tempArr.length/2]), sizeof(double)*(tempArr.length/2+1));
-					tempArr.Arr=(double *)realloc(myArray->Arr,(tempArr.length/2+1)*sizeof(double));
+					tempArr.Arr=(double *)realloc(tempArr.Arr,(tempArr.length/2+1)*sizeof(double));
 					myArray->length=tempArr.length/2+1;
 				}
 				

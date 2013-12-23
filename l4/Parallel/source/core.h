@@ -47,7 +47,7 @@ inline int isPowerOfTwo (unsigned int x){
  */
 
 inline double getAvg(array* myArray, MPI_Comm currentComm){
-	double avg=0.;
+	double avg=0.,avg1=0.;
 	int Len=1;
 	
 	//Суммируем элементы в каждом массиве 
@@ -55,9 +55,9 @@ inline double getAvg(array* myArray, MPI_Comm currentComm){
 	
 	//Собраем число элементов в каждой группе и групповую сумму
 	MPI_Allreduce(&(myArray->length), &Len, 1, MPI_INT, MPI_SUM, currentComm);
-	MPI_Allreduce(&avg,&avg, 1, MPI_DOUBLE, MPI_SUM, currentComm);
+	MPI_Allreduce(&avg,&avg1, 1, MPI_DOUBLE, MPI_SUM, currentComm);
 	
 	//Среднее арифметическое
-	return (avg/(double)Len);
+	return (avg1/(double)Len);
 }
 #endif

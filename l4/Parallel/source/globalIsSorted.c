@@ -25,6 +25,9 @@ int globalIsSorted(array* myArray,MPI_Comm currentComm){
 	if(rank<ProcNum-1)
 		MPI_Send(&(myArray->Arr[myArray->length-1]), 1,MPI_DOUBLE,rank+1,0,currentComm);
 	
+	/*fprintf(stderr,"last %lf %i\n",myArray->Arr[myArray->length-1],rank);
+	fprintf(stderr," 0 %lf %i\n",myArray->Arr[0],rank);
+	fprintf(stderr," 1 %lf %i\n",myArray->Arr[1],rank);*/
 	//Проверяем что этот элемент не превосходит первый элемент массива	
 	if(rank>0){
 		MPI_Recv(&guest,1,MPI_DOUBLE,rank-1,0,currentComm,MPI_STATUS_IGNORE);
