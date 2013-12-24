@@ -29,6 +29,7 @@ double core(double T,double L,int I,int NFRAMES){
 	int dfr = 0;
 	long long int Tstep=0;
 	border *borders; //границы разбиений
+	border *tempborder;
 	MPI_Status	*status;
 	
 	borders=NULL;
@@ -41,26 +42,29 @@ double core(double T,double L,int I,int NFRAMES){
 	MPI_Comm_size(MPI_COMM_WORLD,&ProcNum);
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 	if(ProcNum-1>sizeC) ProcNum=sizeC+1;
-		
+			
 	if(rank<ProcNum){
 
 	if(rank==0){
 		borders=(border*)malloc(sizeof(border)*ProcNum);
 		getBorder(borders,sizeC,ProcNum);
+		tempborder=(border*)malloc(sizeof(border));
 	}
 	else
-		borders=(border*)malloc(sizeof(border));
+		tempborder=(border*)malloc(sizeof(border));
 	
-	
-	Build_derived_type(borders,&message_type);//Инициализируем свой mpi тип
-	
+
+	Build_derived_type(	tempborder,&message_type);//Инициализируем свой mpi тип
+
 	t=MPI_Wtime();
 	//Рассылаем границы разбиений(они идут друг за другом номера элементов соответствуют номерам процессов)
-	MPI_Scatter(borders,1,message_type,borders,1,message_type,0,MPI_COMM_WORLD);
-	
+	MPI_Scatter(borders,1,message_type,tempborder,1,message_type,0,MPI_COMM_WORLD);
+
+	if(rank!=0)	
+		borders=tempborder;
 	sizeL=(*borders).length;//число строк
 	cury=(double)(*borders).left*dy;//номер первой строки
-	
+
 
 	if(rank!=0 && rank!=ProcNum-1){//на некрайних процессах на один буфер больше
 		CurPoints=calloc((sizeL+2)*sizeC,sizeof(point));
@@ -172,15 +176,15 @@ double core(double T,double L,int I,int NFRAMES){
 				MPI_Send(&PrePoints[reductor(sizeL-1,0,sizeC)],sizeC,data_type,rank+1,0,MPI_COMM_WORLD);
 		}
 		if(rank>0)
-			MPI_Recv(&PrePoints[reductor(0,0,sizeC)],sizeC,data_type,rank-1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
+			MPI_Recv(&PrePoints[reductor(0,0,sizeC)],sizeC,data_type,rank-1,MPI_ANY_TAG,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 			
 		if(rank > 0)
 			MPI_Send(&PrePoints[reductor(1,0,sizeC)],sizeC,data_type,rank-1,0,MPI_COMM_WORLD);
 		if(rank < ProcNum-1 ){
 			if(rank!=0)
-				MPI_Recv(&PrePoints[reductor(sizeL+1,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
+				MPI_Recv(&PrePoints[reductor(sizeL+1,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			else
-				MPI_Recv(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD,status);
+				MPI_Recv(&PrePoints[reductor(sizeL,0,sizeC)],sizeC,data_type,rank+1,MPI_ANY_TAG,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			}
 		
 		if(NFRAMES!=0){
