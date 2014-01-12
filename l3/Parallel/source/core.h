@@ -49,23 +49,23 @@ inline double c(double u){
 }
 
 inline double u0(double x,double y){
-	return (300.+40.*x)*(sinf(M_PI*y)+1.);
+	return (400.+50.*(x*x+y*y));
 }
 
 inline double mu1(double y, double tau){
-	return 300.*(sinf(M_PI*y)+1.)+700.*tau/(y+1.);
+	return 400.+50.*y*y+100.*tau*sqrt(16.+20.*y*y);
 }
 
 inline double mu2(double y, double tau){
-	return 340.*expf(-0.125*y*tau)*(sin(M_PI*y)+1.);
+	return 450.+50.*y*y+150.*tau*(1.-y);
 }
 
 inline double mu3(double x, double tau){
-	return 340.*x+(1.-x)*(300.+700.*tau);
+	return 400.+50.*x*x+400.*tau*cosf(2*M_PI*x)-250.*tau*x;
 }
 
 inline double mu4(double x, double tau){
-	return 340.*x*expf(-0.125*tau)+(1.-x)*(300.+350.*tau);
+	return 450.+50.*x*x+600.*tau*cosf(M_PI*x/2);
 }
 
 inline double lambda(double u){
